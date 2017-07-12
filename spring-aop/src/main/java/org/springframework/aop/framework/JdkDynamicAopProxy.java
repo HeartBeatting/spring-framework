@@ -16,22 +16,21 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
-
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.RawTargetAccess;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * JDK-based {@link AopProxy} implementation for the Spring AOP framework,
@@ -114,9 +113,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating JDK dynamic proxy: target source is " + this.advised.getTargetSource());
 		}
-		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);
+		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);	//补充代理的接口
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
-		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
+		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);	//创建jdk动态代理对象
 	}
 
 	/**
@@ -129,10 +128,10 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			Method[] methods = proxiedInterface.getDeclaredMethods();
 			for (Method method : methods) {
 				if (AopUtils.isEqualsMethod(method)) {
-					this.equalsDefined = true;
+					this.equalsDefined = true;	//代理对象自己实现了equals方法
 				}
 				if (AopUtils.isHashCodeMethod(method)) {
-					this.hashCodeDefined = true;
+					this.hashCodeDefined = true;	//代理对象自己实现了hashcode方法
 				}
 				if (this.equalsDefined && this.hashCodeDefined) {
 					return;
@@ -143,8 +142,8 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 
 	/**
-	 * Implementation of {@code InvocationHandler.invoke}.
-	 * <p>Callers will see exactly the exception thrown by the target,
+	 * Implementation of {@code InvocationHandler.invoke}.				//InvocationHandler.invoke 调用目标对象会调用这个代理对象的 invoke方法
+	 * <p>Callers will see exactly the exception thrown by the target,	//try finally 没有catch异常
 	 * unless a hook method throws an exception.
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -233,9 +232,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 
 	/**
-	 * Equality means interfaces, advisors and TargetSource are equal.
-	 * <p>The compared object may be a JdkDynamicAopProxy instance itself
-	 * or a dynamic proxy wrapping a JdkDynamicAopProxy instance.
+	 * Equality means interfaces, advisors and TargetSource are equal.		//如果接口,增强和代理对象都相同才相等
+	 * <p>The compared object may be a JdkDynamicAopProxy instance itself	//比较的对象是JdkDynamicAopProxy实例
+	 * or a dynamic proxy wrapping a JdkDynamicAopProxy instance.			//或者是一个JdkDynamicAopProxy实例包装对象
 	 */
 	@Override
 	public boolean equals(Object other) {
@@ -250,9 +249,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		if (other instanceof JdkDynamicAopProxy) {
 			otherProxy = (JdkDynamicAopProxy) other;
 		}
-		else if (Proxy.isProxyClass(other.getClass())) {
-			InvocationHandler ih = Proxy.getInvocationHandler(other);
-			if (!(ih instanceof JdkDynamicAopProxy)) {
+		else if (Proxy.isProxyClass(other.getClass())) {	//other的class是代理类
+			InvocationHandler ih = Proxy.getInvocationHandler(other);	//获取代理对象的InvocationHandler
+			if (!(ih instanceof JdkDynamicAopProxy)) {		//不是JdkDynamicAopProxy直接返回false
 				return false;
 			}
 			otherProxy = (JdkDynamicAopProxy) ih;
@@ -270,7 +269,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	 * Proxy uses the hash code of the TargetSource.
 	 */
 	@Override
-	public int hashCode() {
+	public int hashCode() {	//依赖TargetSource 的 hashcode
 		return JdkDynamicAopProxy.class.hashCode() * 13 + this.advised.getTargetSource().hashCode();
 	}
 

@@ -19,10 +19,10 @@ package org.springframework.beans.factory.config;
 import org.springframework.beans.BeansException;
 
 /**
- * Allows for custom modification of an application context's bean definitions,
+ * Allows for custom modification of an application context's bean definitions,		//允许正常的Bean属性修改
  * adapting the bean property values of the context's underlying bean factory.
  *
- * <p>Application contexts can auto-detect BeanFactoryPostProcessor beans in
+ * <p>Application contexts can auto-detect BeanFactoryPostProcessor beans in		//自动检测到BeanFactoryPostProcessor,在其他bean创建之前
  * their bean definitions and apply them before any other beans get created.
  *
  * <p>Useful for custom config files targeted at system administrators that

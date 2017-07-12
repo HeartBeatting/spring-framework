@@ -16,26 +16,6 @@
 
 package org.springframework.jdbc.core;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javax.sql.DataSource;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.support.DataAccessUtils;
@@ -49,6 +29,14 @@ import org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedCaseInsensitiveMap;
+
+import javax.sql.DataSource;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.sql.*;
+import java.util.*;
 
 /**
  * <b>This is the central class in the JDBC core package.</b>
@@ -325,10 +313,10 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// Methods dealing with a plain java.sql.Connection
 	//-------------------------------------------------------------------------
 
-	public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {
+	public <T> T execute(ConnectionCallback<T> action) throws DataAccessException {		//action回调方法是传入的;
 		Assert.notNull(action, "Callback object must not be null");
 
-		Connection con = DataSourceUtils.getConnection(getDataSource());
+		Connection con = DataSourceUtils.getConnection(getDataSource());				//Connection对象是实时获取的,不需要外面实例化
 		try {
 			Connection conToUse = con;
 			if (this.nativeJdbcExtractor != null) {

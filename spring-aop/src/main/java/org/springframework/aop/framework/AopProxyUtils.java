@@ -16,14 +16,14 @@
 
 package org.springframework.aop.framework;
 
-import java.util.Arrays;
-
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.util.Assert;
+
+import java.util.Arrays;
 
 /**
  * Utility methods for AOP proxy factories.
@@ -87,8 +87,8 @@ public abstract class AopProxyUtils {
 				specifiedInterfaces = new Class[] {targetClass};
 			}
 		}
-		boolean addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);
-		boolean addAdvised = !advised.isOpaque() && !advised.isInterfaceProxied(Advised.class);
+		boolean addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);	//没有实现SpringProxy接口
+		boolean addAdvised = !advised.isOpaque() && !advised.isInterfaceProxied(Advised.class);		//没有实现Advised接口
 		int nonUserIfcCount = 0;
 		if (addSpringProxy) {
 			nonUserIfcCount++;
@@ -99,10 +99,10 @@ public abstract class AopProxyUtils {
 		Class[] proxiedInterfaces = new Class[specifiedInterfaces.length + nonUserIfcCount];
 		System.arraycopy(specifiedInterfaces, 0, proxiedInterfaces, 0, specifiedInterfaces.length);
 		if (addSpringProxy) {
-			proxiedInterfaces[specifiedInterfaces.length] = SpringProxy.class;
+			proxiedInterfaces[specifiedInterfaces.length] = SpringProxy.class;	//实现SpringProxy接口
 		}
 		if (addAdvised) {
-			proxiedInterfaces[proxiedInterfaces.length - 1] = Advised.class;
+			proxiedInterfaces[proxiedInterfaces.length - 1] = Advised.class;	//实现Advised接口
 		}
 		return proxiedInterfaces;
 	}

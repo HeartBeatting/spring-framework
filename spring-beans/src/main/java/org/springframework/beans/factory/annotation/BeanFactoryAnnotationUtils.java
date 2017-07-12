@@ -16,8 +16,6 @@
 
 package org.springframework.beans.factory.annotation;
 
-import java.lang.reflect.Method;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -27,6 +25,8 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.ObjectUtils;
+
+import java.lang.reflect.Method;
 
 /**
  * Convenience methods performing bean lookups related to annotations, for example
@@ -45,7 +45,7 @@ public class BeanFactoryAnnotationUtils {
 	 * qualifier, or having a bean name matching the given qualifier.
 	 * @param beanFactory the BeanFactory to get the target bean from
 	 * @param beanType the type of bean to retrieve
-	 * @param qualifier the qualifier for selecting between multiple bean matches
+	 * @param qualifier the qualifier for selecting between multiple bean matches	//找到多个类型匹配的bean后,用于筛选
 	 * @return the matching bean of type {@code T} (never {@code null})
 	 * @throws NoSuchBeanDefinitionException if no matching bean of type {@code T} found
 	 */

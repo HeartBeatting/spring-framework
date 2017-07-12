@@ -16,9 +16,9 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-
 import org.springframework.util.Assert;
+
+import java.io.Serializable;
 
 /**
  * Convenience superclass for configuration used in creating proxies,
@@ -87,7 +87,7 @@ public class ProxyConfig implements Serializable {
 	 * Return whether proxies should perform aggressive optimizations.
 	 */
 	public boolean isOptimize() {
-		return this.optimize;
+		return this.optimize;	//为true会走Cglib代理
 	}
 
 	/**

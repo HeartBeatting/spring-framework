@@ -33,7 +33,7 @@ public interface TransactionAttribute extends TransactionDefinition {
 
 	/**
 	 * Return a qualifier value associated with this transaction attribute.
-	 * <p>This may be used for choosing a corresponding transaction manager
+	 * <p>This may be used for choosing a corresponding transaction manager		//选择对应的transaction manager 事务管理器
 	 * to process this specific transaction.
 	 */
 	String getQualifier();
@@ -43,6 +43,6 @@ public interface TransactionAttribute extends TransactionDefinition {
 	 * @param ex the exception to evaluate
 	 * @return whether to perform a rollback or not
 	 */
-	boolean rollbackOn(Throwable ex);
+	boolean rollbackOn(Throwable ex);	//什么异常回滚
 
 }

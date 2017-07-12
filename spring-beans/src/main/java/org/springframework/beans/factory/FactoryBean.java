@@ -55,7 +55,7 @@ public interface FactoryBean<T> {
 	/**
 	 * Return an instance (possibly shared or independent) of the object
 	 * managed by this factory.
-	 * <p>As with a {@link BeanFactory}, this allows support for both the
+	 * <p>As with a {@link BeanFactory}, this allows support for both the	//支持单例和多例的
 	 * Singleton and Prototype design pattern.
 	 * <p>If this FactoryBean is not fully initialized yet at the time of
 	 * the call (for example because it is involved in a circular reference),

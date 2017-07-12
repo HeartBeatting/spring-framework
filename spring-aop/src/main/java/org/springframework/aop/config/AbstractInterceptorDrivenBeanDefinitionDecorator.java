@@ -16,22 +16,17 @@
 
 package org.springframework.aop.config;
 
-import java.util.List;
-
-import org.w3c.dom.Node;
-
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.support.*;
 import org.springframework.beans.factory.xml.BeanDefinitionDecorator;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+import org.w3c.dom.Node;
+
+import java.util.List;
 
 /**
  * Base implementation for
@@ -58,6 +53,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractInterceptorDrivenBeanDefinitionDecorator implements BeanDefinitionDecorator {
 
+	//nameSpaceHandler会调用
 	public final BeanDefinitionHolder decorate(Node node, BeanDefinitionHolder definitionHolder, ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 
@@ -76,11 +72,11 @@ public abstract class AbstractInterceptorDrivenBeanDefinitionDecorator implement
 
 		BeanDefinitionHolder result = definitionHolder;
 
-		if (!isProxyFactoryBeanDefinition(targetDefinition)) {
+		if (!isProxyFactoryBeanDefinition(targetDefinition)) {		//判断是ProxyFactoryBean
 			// create the proxy definition
 			RootBeanDefinition proxyDefinition = new RootBeanDefinition();
 			// create proxy factory bean definition
-			proxyDefinition.setBeanClass(ProxyFactoryBean.class);
+			proxyDefinition.setBeanClass(ProxyFactoryBean.class);			//这里是注册bean的class;在实例化bean时,如果bean是单例的,会立即实例化并缓存下来;
 			proxyDefinition.setScope(targetDefinition.getScope());
 			proxyDefinition.setLazyInit(targetDefinition.isLazyInit());
 			// set the target
@@ -98,7 +94,7 @@ public abstract class AbstractInterceptorDrivenBeanDefinitionDecorator implement
 			result = new BeanDefinitionHolder(proxyDefinition, existingBeanName);
 		}
 
-		addInterceptorNameToList(interceptorName, result.getBeanDefinition());
+		addInterceptorNameToList(interceptorName, result.getBeanDefinition());	//增加拦截器bean的名称
 		return result;
 	}
 

@@ -16,24 +16,8 @@
 
 package org.springframework.aop.framework;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aopalliance.aop.Advice;
-
-import org.springframework.aop.Advisor;
-import org.springframework.aop.DynamicIntroductionAdvice;
-import org.springframework.aop.IntroductionAdvisor;
-import org.springframework.aop.IntroductionInfo;
-import org.springframework.aop.TargetSource;
+import org.springframework.aop.*;
 import org.springframework.aop.support.DefaultIntroductionAdvisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.target.EmptyTargetSource;
@@ -41,6 +25,12 @@ import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class for AOP proxy configuration managers.
@@ -82,7 +72,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
 
 	/** Cache with Method as key and advisor chain List as value */
-	private transient Map<MethodCacheKey, List<Object>> methodCache;
+	private transient Map<MethodCacheKey, List<Object>> methodCache;	//todo ?
 
 	/**
 	 * Interfaces to be implemented by the proxy. Held in List to keep the order
@@ -94,7 +84,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	 * List of Advisors. If an Advice is added, it will be wrapped
 	 * in an Advisor before being added to this List.
 	 */
-	private List<Advisor> advisors = new LinkedList<Advisor>();
+	private List<Advisor> advisors = new LinkedList<Advisor>();		//增强列表 LinkedList 按顺序的
 
 	/**
 	 * Array updated on changes to the advisors list, which is easier
@@ -360,7 +350,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	private void addAdvisorInternal(int pos, Advisor advisor) throws AopConfigException {
 		Assert.notNull(advisor, "Advisor must not be null");
 		if (isFrozen()) {
-			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");
+			throw new AopConfigException("Cannot add advisor: Configuration is frozen.");	//不允许修改
 		}
 		if (pos > this.advisors.size()) {
 			throw new IllegalArgumentException(

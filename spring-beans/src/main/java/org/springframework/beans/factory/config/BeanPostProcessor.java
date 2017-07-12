@@ -39,13 +39,13 @@ import org.springframework.beans.BeansException;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
-public interface BeanPostProcessor {
+public interface BeanPostProcessor {	//实现了这个接口,在初始化bean前后会调用相应的方法;
 
 	/**
 	 * Apply this BeanPostProcessor to the given new bean instance <i>before</i> any bean
-	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}			//postProcessBeforeInitialization在afterPropertiesSet之前生效
 	 * or a custom init-method). The bean will already be populated with property values.
-	 * The returned bean instance may be a wrapper around the original.
+	 * The returned bean instance may be a wrapper around the original.						//可以返回原始bean的一个包装
 	 * @param bean the new bean instance
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one; if
@@ -57,7 +57,7 @@ public interface BeanPostProcessor {
 
 	/**
 	 * Apply this BeanPostProcessor to the given new bean instance <i>after</i> any bean
-	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
+	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}			//在afterPropertiesSet之后
 	 * or a custom init-method). The bean will already be populated with property values.
 	 * The returned bean instance may be a wrapper around the original.
 	 * <p>In case of a FactoryBean, this callback will be invoked for both the FactoryBean

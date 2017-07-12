@@ -16,62 +16,18 @@
 
 package org.springframework.beans.factory.support;
 
-import java.beans.PropertyEditor;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
-import org.springframework.beans.PropertyEditorRegistrySupport;
-import org.springframework.beans.SimpleTypeConverter;
-import org.springframework.beans.TypeConverter;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.BeanIsAbstractException;
-import org.springframework.beans.factory.BeanIsNotAFactoryException;
-import org.springframework.beans.factory.BeanNotOfRequiredTypeException;
-import org.springframework.beans.factory.CannotLoadBeanClassException;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.SmartFactoryBean;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.BeanExpressionContext;
-import org.springframework.beans.factory.config.BeanExpressionResolver;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.Scope;
+import org.springframework.beans.*;
+import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.config.*;
 import org.springframework.core.DecoratingClassLoader;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.StringValueResolver;
+import org.springframework.util.*;
+
+import java.beans.PropertyEditor;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Abstract base class for {@link org.springframework.beans.factory.BeanFactory}
@@ -470,7 +426,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Check manually registered singletons.
 		Object beanInstance = getSingleton(beanName, false);
 		if (beanInstance != null) {
-			if (beanInstance instanceof FactoryBean) {
+			if (beanInstance instanceof FactoryBean) {		//FactoryBean,如果是FactoryBean则需要比较getObjectType;如果是Bean实例,直接比较类型就可以
 				if (!BeanFactoryUtils.isFactoryDereference(name)) {
 					Class<?> type = getTypeForFactoryBean((FactoryBean<?>) beanInstance);
 					return (type != null && ClassUtils.isAssignable(typeToMatch, type));
@@ -766,6 +722,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return result;
 	}
 
+	//spring很多地方都是靠注册BeanPostProcesser 对bean进行包装或者增强
+	//@see org.springframework.context.support.AbstractApplicationContext.prepareBeanFactory()
 	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
 		Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");
 		this.beanPostProcessors.remove(beanPostProcessor);

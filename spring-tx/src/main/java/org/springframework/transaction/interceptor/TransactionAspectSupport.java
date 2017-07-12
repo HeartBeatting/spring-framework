@@ -119,7 +119,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 
 	private PlatformTransactionManager transactionManager;
 
-	private TransactionAttributeSource transactionAttributeSource;
+	private TransactionAttributeSource transactionAttributeSource;	//事务属性
 
 	private BeanFactory beanFactory;
 
@@ -164,8 +164,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * @see TransactionAttributeEditor
 	 * @see NameMatchTransactionAttributeSource
 	 */
-	public void setTransactionAttributes(Properties transactionAttributes) {
-		NameMatchTransactionAttributeSource tas = new NameMatchTransactionAttributeSource();
+	public void setTransactionAttributes(Properties transactionAttributes) {	//设置走事务的方法,默认的事务传播级别和只读等事务属性
+		NameMatchTransactionAttributeSource tas = new NameMatchTransactionAttributeSource();	//属性对象 存储method和事务属性
 		tas.setProperties(transactionAttributes);
 		this.transactionAttributeSource = tas;
 	}
@@ -219,7 +219,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	/**
 	 * Check that required properties were set.
 	 */
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() {	//实例化bean时,校验下
 		if (this.transactionManager == null && this.beanFactory == null) {
 			throw new IllegalStateException(
 					"Setting the property 'transactionManager' or running in a ListableBeanFactory is required");
@@ -252,22 +252,22 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 
 		if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
 			// Standard transaction demarcation with getTransaction and commit/rollback calls.
-			TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
+			TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);	//todo
 			Object retVal = null;
 			try {
-				// This is an around advice: Invoke the next interceptor in the chain.
+				// This is an around advice: Invoke the next interceptor in the chain.	//around 增强,会就绪调用拦截器链
 				// This will normally result in a target object being invoked.
-				retVal = invocation.proceedWithInvocation();
+				retVal = invocation.proceedWithInvocation();	//todo ?
 			}
 			catch (Throwable ex) {
 				// target invocation exception
-				completeTransactionAfterThrowing(txInfo, ex);
+				completeTransactionAfterThrowing(txInfo, ex);	//catch 到异常,判断是否回滚
 				throw ex;
 			}
 			finally {
-				cleanupTransactionInfo(txInfo);
+				cleanupTransactionInfo(txInfo);		//清楚事务标记
 			}
-			commitTransactionAfterReturning(txInfo);
+			commitTransactionAfterReturning(txInfo);	//todo 这里为什么还要commit
 			return retVal;
 		}
 
@@ -325,7 +325,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		}
 		String qualifier = txAttr.getQualifier();
 		if (StringUtils.hasLength(qualifier)) {
-			return BeanFactoryAnnotationUtils.qualifiedBeanOfType(this.beanFactory, PlatformTransactionManager.class, qualifier);
+			return BeanFactoryAnnotationUtils.qualifiedBeanOfType(this.beanFactory, PlatformTransactionManager.class, qualifier);	//利用beanFactory寻找事务管理器的bean
 		}
 		else if (this.transactionManagerBeanName != null) {
 			return this.beanFactory.getBean(this.transactionManagerBeanName, PlatformTransactionManager.class);
@@ -488,7 +488,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				logger.trace("Completing transaction for [" + txInfo.getJoinpointIdentification() +
 						"] after exception: " + ex);
 			}
-			if (txInfo.transactionAttribute.rollbackOn(ex)) {
+			if (txInfo.transactionAttribute.rollbackOn(ex)) {	//判断是否要回滚
 				try {
 					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
 				}
@@ -599,7 +599,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		private void bindToThread() {
 			// Expose current TransactionStatus, preserving any existing TransactionStatus
 			// for restoration after this transaction is complete.
-			this.oldTransactionInfo = transactionInfoHolder.get();
+			this.oldTransactionInfo = transactionInfoHolder.get();	//等当前事务完成,恢复老的事务
 			transactionInfoHolder.set(this);
 		}
 

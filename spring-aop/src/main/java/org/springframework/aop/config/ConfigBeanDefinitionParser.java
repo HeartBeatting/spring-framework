@@ -16,27 +16,9 @@
 
 package org.springframework.aop.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.springframework.aop.aspectj.AspectJAfterAdvice;
-import org.springframework.aop.aspectj.AspectJAfterReturningAdvice;
-import org.springframework.aop.aspectj.AspectJAfterThrowingAdvice;
-import org.springframework.aop.aspectj.AspectJAroundAdvice;
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
-import org.springframework.aop.aspectj.AspectJMethodBeforeAdvice;
-import org.springframework.aop.aspectj.AspectJPointcutAdvisor;
-import org.springframework.aop.aspectj.DeclareParentsAdvisor;
+import org.springframework.aop.aspectj.*;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.*;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.parsing.ParseState;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -47,6 +29,12 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link BeanDefinitionParser} for the {@code &lt;aop:config&gt;} tag.
@@ -100,10 +88,10 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
 
-		configureAutoProxyCreator(parserContext, element);
+		configureAutoProxyCreator(parserContext, element);	//配置 AutoProxyCreator ??
 
 		List<Element> childElts = DomUtils.getChildElements(element);
-		for (Element elt: childElts) {
+		for (Element elt: childElts) {	//<aop:config 下面的子元素
 			String localName = parserContext.getDelegate().getLocalName(elt);
 			if (POINTCUT.equals(localName)) {
 				parsePointcut(elt, parserContext);

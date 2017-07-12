@@ -16,18 +16,17 @@
 
 package org.springframework.transaction.interceptor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.PatternMatchUtils;
+
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.PatternMatchUtils;
 
 /**
  * Simple {@link TransactionAttributeSource} implementation that
@@ -77,7 +76,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 		while (propNames.hasMoreElements()) {
 			String methodName = (String) propNames.nextElement();
 			String value = transactionAttributes.getProperty(methodName);
-			tae.setAsText(value);
+			tae.setAsText(value);	//解析配置里的事务配置
 			TransactionAttribute attr = (TransactionAttribute) tae.getValue();
 			addTransactionalMethod(methodName, attr);
 		}
@@ -101,14 +100,14 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
 		// look for direct name match
 		String methodName = method.getName();
-		TransactionAttribute attr = this.nameMap.get(methodName);
+		TransactionAttribute attr = this.nameMap.get(methodName);	//先直接根据key,查找map元素
 
-		if (attr == null) {
+		if (attr == null) {		//找不到,就寻找最匹配的key
 			// Look for most specific name match.
 			String bestNameMatch = null;
 			for (String mappedName : this.nameMap.keySet()) {
 				if (isMatch(methodName, mappedName) &&
-						(bestNameMatch == null || bestNameMatch.length() <= mappedName.length())) {
+						(bestNameMatch == null || bestNameMatch.length() <= mappedName.length())) {		//mappedName 最长的就是匹配度最高的
 					attr = this.nameMap.get(mappedName);
 					bestNameMatch = mappedName;
 				}

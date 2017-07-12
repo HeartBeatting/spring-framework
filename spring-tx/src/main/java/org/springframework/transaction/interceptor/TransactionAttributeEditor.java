@@ -16,9 +16,9 @@
 
 package org.springframework.transaction.interceptor;
 
-import java.beans.PropertyEditorSupport;
-
 import org.springframework.util.StringUtils;
+
+import java.beans.PropertyEditorSupport;
 
 /**
  * PropertyEditor for {@link TransactionAttribute} objects. Accepts a String of form
@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.transaction.TransactionDefinition
  * @see org.springframework.core.Constants
  */
+//事务属性编辑器
 public class TransactionAttributeEditor extends PropertyEditorSupport {
 
 	/**

@@ -19,21 +19,22 @@ package org.springframework.aop;
 import org.aopalliance.aop.Advice;
 
 /**
- * Base interface holding AOP <b>advice</b> (action to take at a joinpoint)
+ * Base interface holding AOP <b>advice</b> (action to take at a joinpoint)	//Advisor 切面 持有增强(advice)的引用
  * and a filter determining the applicability of the advice (such as
  * a pointcut). <i>This interface is not for use by Spring users, but to
  * allow for commonality in support for different types of advice.</i>
  *
- * <p>Spring AOP is based around <b>around advice</b> delivered via method
+ * <p>Spring AOP is based around <b>around advice</b> delivered via method	//Spring aop基于interception的前后增强(around advice)
  * <b>interception</b>, compliant with the AOP Alliance interception API.
- * The Advisor interface allows support for different types of advice,
- * such as <b>before</b> and <b>after</b> advice, which need not be
+ * The Advisor interface allows support for different types of advice,		//Advisor 支持不同类型的增强
+ * such as <b>before</b> and <b>after</b> advice, which need not be			//比如前置和后置增强
  * implemented using interception.
  *
  * @author Rod Johnson
  */
-public interface Advisor {
-
+public interface Advisor {	//-->Advisor 切面就是由切点(pointcut)和增强(advice)组成
+	//因为Advice包含了横切代码和连接点的信息，所以Advice本身就是一个简单的切面，只不过它代表的横切的连接点是所有目标类的所有方法，因为这个横切面太宽泛，所以一般不会直接使用；
+	//Advisor是Pointcut和Advice的配置器，它包括Pointcut和Advice，是将Advice注入程序中Pointcut位置的代码
 	/**
 	 * Return the advice part of this aspect. An advice may be an
 	 * interceptor, a before advice, a throws advice, etc.

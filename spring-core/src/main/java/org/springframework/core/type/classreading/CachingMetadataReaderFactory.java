@@ -16,12 +16,12 @@
 
 package org.springframework.core.type.classreading;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * Caching implementation of the {@link MetadataReaderFactory} interface,
@@ -45,7 +45,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 			new LinkedHashMap<Resource, MetadataReader>(DEFAULT_CACHE_LIMIT, 0.75f, true) {
 				@Override
 				protected boolean removeEldestEntry(Map.Entry<Resource, MetadataReader> eldest) {
-					return size() > getCacheLimit();
+					return size() > getCacheLimit();	//当size大于256,会删除最老的
 				}
 			};
 
@@ -94,7 +94,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 	@Override
 	public MetadataReader getMetadataReader(Resource resource) throws IOException {
 		if (getCacheLimit() <= 0) {
-			return super.getMetadataReader(resource);
+			return super.getMetadataReader(resource);	//这里返回的SimpleMetadataReader里的ClassReader,是利用ASM读取class字节码里的元信息(Component注解)
 		}
 		synchronized (this.metadataReaderCache) {
 			MetadataReader metadataReader = this.metadataReaderCache.get(resource);

@@ -16,20 +16,10 @@
 
 package org.springframework.aop.framework;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.Interceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.adapter.AdvisorAdapterRegistry;
@@ -37,16 +27,15 @@ import org.springframework.aop.framework.adapter.GlobalAdvisorAdapterRegistry;
 import org.springframework.aop.framework.adapter.UnknownAdviceTypeException;
 import org.springframework.aop.target.SingletonTargetSource;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.FactoryBeanNotInitializedException;
-import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.*;
 import org.springframework.core.OrderComparator;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * {@link org.springframework.beans.factory.FactoryBean} implementation that builds an
@@ -119,9 +108,9 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	private transient BeanFactory beanFactory;
 
 	/** Whether the advisor chain has already been initialized */
-	private boolean advisorChainInitialized = false;
+	private boolean advisorChainInitialized = false;					//advisor 链是否已经初始化
 
-	/** If this is a singleton, the cached singleton proxy instance */
+	/** If this is a singleton, the cached singleton proxy instance */	//缓存的代理对象
 	private Object singletonInstance;
 
 
@@ -238,9 +227,9 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * @return a fresh AOP proxy reflecting the current state of this factory
 	 */
 	public Object getObject() throws BeansException {
-		initializeAdvisorChain();
-		if (isSingleton()) {
-			return getSingletonInstance();
+		initializeAdvisorChain();	//初始化增强链(拦截器,前置增强等..) ,todo
+		if (isSingleton()) {		//支持配置成单例或者是多例的,多例每次都新建一个实例
+			return getSingletonInstance();	//实例化FactoryBean时会调用getObject(),所以会缓存advice对象
 		}
 		else {
 			if (this.targetName == null) {
@@ -303,20 +292,20 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 */
 	private synchronized Object getSingletonInstance() {
 		if (this.singletonInstance == null) {
-			this.targetSource = freshTargetSource();
+			this.targetSource = freshTargetSource();	//更新被代理的目标对象
 			if (this.autodetectInterfaces && getProxiedInterfaces().length == 0 && !isProxyTargetClass()) {
 				// Rely on AOP infrastructure to tell us what interfaces to proxy.
 				Class<?> targetClass = getTargetClass();
 				if (targetClass == null) {
 					throw new FactoryBeanNotInitializedException("Cannot determine target class for proxy");
 				}
-				setInterfaces(ClassUtils.getAllInterfacesForClass(targetClass, this.proxyClassLoader));
+				setInterfaces(ClassUtils.getAllInterfacesForClass(targetClass, this.proxyClassLoader));	//获取被代理对象的所有接口,有序的
 			}
 			// Initialize the shared singleton instance.
-			super.setFrozen(this.freezeProxy);
-			this.singletonInstance = getProxy(createAopProxy());
+			super.setFrozen(this.freezeProxy);	//不允许修改
+			this.singletonInstance = getProxy(createAopProxy());	//第一次进来会createAopProxy()创建动态代理对象
 		}
-		return this.singletonInstance;
+		return this.singletonInstance;	//不为空就直接返回了
 	}
 
 	/**
@@ -409,8 +398,8 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	}
 
 	/**
-	 * Create the advisor (interceptor) chain. Aadvisors that are sourced
-	 * from a BeanFactory will be refreshed each time a new prototype instance
+	 * Create the advisor (interceptor) chain. advisors that are sourced		//创建拦截器链
+	 * from a BeanFactory will be refreshed each time a new prototype instance	//BeanFactory 刷新的时候 会调用初始化方法
 	 * is added. Interceptors added programmatically through the factory API
 	 * are unaffected by such changes.
 	 */
@@ -443,7 +432,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 								"Can only use global advisors or interceptors with a ListableBeanFactory");
 					}
 					addGlobalAdvisor((ListableBeanFactory) this.beanFactory,
-							name.substring(0, name.length() - GLOBAL_SUFFIX.length()));
+							name.substring(0, name.length() - GLOBAL_SUFFIX.length()));		//增加全局的增强
 				}
 
 				else {
@@ -505,9 +494,9 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 */
 	private void addGlobalAdvisor(ListableBeanFactory beanFactory, String prefix) {
 		String[] globalAdvisorNames =
-				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Advisor.class);
+				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Advisor.class);		//所有的切面?
 		String[] globalInterceptorNames =
-				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Interceptor.class);
+				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(beanFactory, Interceptor.class);	//所有的拦截器
 		List<Object> beans = new ArrayList<Object>(globalAdvisorNames.length + globalInterceptorNames.length);
 		Map<Object, String> names = new HashMap<Object, String>(beans.size());
 		for (String name : globalAdvisorNames) {

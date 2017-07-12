@@ -22,9 +22,9 @@ import org.springframework.aop.TargetSource;
 import org.springframework.util.ClassUtils;
 
 /**
- * Factory for AOP proxies for programmatic use, rather than via a bean
- * factory. This class provides a simple way of obtaining and configuring
- * AOP proxies in code.
+ * Factory for AOP proxies for programmatic use, rather than via a bean		//代理工厂类,用于显示的编程用的
+ * factory. This class provides a simple way of obtaining and configuring	//这个类提供了代码上显示的获取和配置
+ * AOP proxies in code.														//@see ProxyFactoryBean 可以用于xml配置
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -97,7 +97,7 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	}
 
 	/**
-	 * Create a new proxy according to the settings in this factory.
+	 * Create a new proxy according to the settings in this factory.	//创建动态代理对象
 	 * <p>Can be called repeatedly. Effect will vary if we've added
 	 * or removed interfaces. Can add and remove interceptors.
 	 * <p>Uses the given class loader (if necessary for proxy creation).

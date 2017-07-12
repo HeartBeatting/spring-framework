@@ -24,7 +24,7 @@ package org.springframework.aop;
  * @author Rod Johnson
  */
 public interface PointcutAdvisor extends Advisor {
-
+	//代表具有切点的切面，它包含Advice和Pointcut两个类，这样我们就可以通过类、方法名以及方法方位等信息灵活地定义切面的连接点，提供更具适用性的切面
 	/**
 	 * Get the Pointcut that drives this advisor.
 	 */

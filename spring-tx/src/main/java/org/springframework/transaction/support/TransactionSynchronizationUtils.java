@@ -16,15 +16,14 @@
 
 package org.springframework.transaction.support;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.core.InfrastructureProxy;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+
+import java.util.List;
 
 /**
  * Utility methods for triggering specific {@link TransactionSynchronization}
@@ -40,7 +39,7 @@ public abstract class TransactionSynchronizationUtils {
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationUtils.class);
 
 	private static final boolean aopAvailable = ClassUtils.isPresent(
-			"org.springframework.aop.scope.ScopedObject", TransactionSynchronizationUtils.class.getClassLoader());
+			"org.springframework.aop.scope.ScopedObject", TransactionSynchronizationUtils.class.getClassLoader());	//判断ScopedObject类是否可以加载
 
 
 	/**
@@ -61,7 +60,7 @@ public abstract class TransactionSynchronizationUtils {
 	static Object unwrapResourceIfNecessary(Object resource) {
 		Assert.notNull(resource, "Resource must not be null");
 		Object resourceRef = resource;
-		// unwrap infrastructure proxy
+		// unwrap infrastructure proxy		获取InfrastructureProxy对象的包装对象
 		if (resourceRef instanceof InfrastructureProxy) {
 			resourceRef = ((InfrastructureProxy) resourceRef).getWrappedObject();
 		}

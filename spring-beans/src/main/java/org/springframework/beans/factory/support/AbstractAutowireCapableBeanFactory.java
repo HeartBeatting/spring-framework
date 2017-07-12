@@ -16,6 +16,15 @@
 
 package org.springframework.beans.factory.support;
 
+import org.springframework.beans.*;
+import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.config.*;
+import org.springframework.core.*;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -25,58 +34,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyAccessorUtils;
-import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
-import org.springframework.beans.TypeConverter;
-import org.springframework.beans.factory.Aware;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.BeanCurrentlyInCreationException;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.UnsatisfiedDependencyException;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
-import org.springframework.beans.factory.config.DependencyDescriptor;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
-import org.springframework.beans.factory.config.TypedStringValue;
-import org.springframework.core.GenericTypeResolver;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.core.PriorityOrdered;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * Abstract bean factory superclass that implements default bean creation,
@@ -388,11 +347,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	//调用 BeanPostProcessorsBeforeInitialization 方法
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
 		Object result = existingBean;
-		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {	//set by addBeanPostProcessor()
 			result = beanProcessor.postProcessBeforeInitialization(result, beanName);
 			if (result == null) {
 				return result;
@@ -401,12 +361,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return result;
 	}
 
-	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)
+	public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName)	//bean创建以后
 			throws BeansException {
 
 		Object result = existingBean;
 		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
-			result = beanProcessor.postProcessAfterInitialization(result, beanName);
+			result = beanProcessor.postProcessAfterInitialization(result, beanName);	//这里可以对bean进行包装(实现拦截器,事务等功能) @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.postProcessAfterInitialization()
 			if (result == null) {
 				return result;
 			}
@@ -482,7 +442,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			instanceWrapper = createBeanInstance(beanName, mbd, args);
+			instanceWrapper = createBeanInstance(beanName, mbd, args);		//bean为null,则根据xml配置文件或者注解创建bean实例
 		}
 		final Object bean = (instanceWrapper != null ? instanceWrapper.getWrappedInstance() : null);
 		Class<?> beanType = (instanceWrapper != null ? instanceWrapper.getWrappedClass() : null);
@@ -917,7 +877,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
-			if (bp instanceof InstantiationAwareBeanPostProcessor) {
+			if (bp instanceof InstantiationAwareBeanPostProcessor) {	//InstantiationAwareBeanPostProcessor里面会处理拦截器注入的内容
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
 				if (result != null) {
@@ -1489,6 +1449,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #invokeInitMethods
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
+	//ConfigurableListableBeanFactory 会调用 initializeBean 初始化一个Bean实例
 	protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) {
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -1499,16 +1460,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
-			invokeAwareMethods(beanName, bean);
+			invokeAwareMethods(beanName, bean);													//调用aware接口的方法,注入需要的引用
 		}
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
-			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);	//调用 BeanPostProcesser方法
 		}
 
 		try {
-			invokeInitMethods(beanName, wrappedBean, mbd);
+			invokeInitMethods(beanName, wrappedBean, mbd);										//调用init-method方法或者propertiy set方法?
 		}
 		catch (Throwable ex) {
 			throw new BeanCreationException(
@@ -1517,7 +1478,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (mbd == null || !mbd.isSynthetic()) {
-			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);	//调用 BeanPostProcesser方法
 		}
 		return wrappedBean;
 	}
@@ -1570,14 +1531,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
-				((InitializingBean) bean).afterPropertiesSet();
+				((InitializingBean) bean).afterPropertiesSet();		//调用afterPropertiesSet方法
 			}
 		}
 
 		if (mbd != null) {
 			String initMethodName = mbd.getInitMethodName();
 			if (initMethodName != null && !(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
-					!mbd.isExternallyManagedInitMethod(initMethodName)) {
+					!mbd.isExternallyManagedInitMethod(initMethodName)) {	//执行init-method
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}

@@ -16,32 +16,13 @@
 
 package org.springframework.jdbc.core.simple;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.SqlTypeValue;
-import org.springframework.jdbc.core.StatementCreatorUtils;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.metadata.TableMetaDataContext;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -49,6 +30,10 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor;
 import org.springframework.util.Assert;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Abstract class to provide base functionality for easy inserts
@@ -472,7 +457,7 @@ public abstract class AbstractJdbcInsert {
 			}
 			else {
 				getJdbcTemplate().execute(new ConnectionCallback<Object>() {
-					public Object doInConnection(Connection con) throws SQLException, DataAccessException {
+					public Object doInConnection(Connection con) throws SQLException, DataAccessException {		//这里只需要定义处理的方法,不关心con的实例化;就将两者解耦了
 						// Do the insert
 						PreparedStatement ps = null;
 						try {

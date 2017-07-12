@@ -16,18 +16,13 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.aspectj.lang.reflect.PerClauseKind;
-
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.util.Assert;
+
+import java.util.*;
 
 /**
  * Helper for retrieving @AspectJ beans from a BeanFactory and building
@@ -88,7 +83,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 				List<Advisor> advisors = new LinkedList<Advisor>();
 				aspectNames = new LinkedList<String>();
 				String[] beanNames =
-						BeanFactoryUtils.beanNamesForTypeIncludingAncestors(this.beanFactory, Object.class, true, false);
+						BeanFactoryUtils.beanNamesForTypeIncludingAncestors(this.beanFactory, Object.class, true, false);	//找出所有的Bean
 				for (String beanName : beanNames) {
 					if (!isEligibleBean(beanName)) {
 						continue;
@@ -100,7 +95,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 					if (beanType == null) {
 						continue;
 					}
-					if (this.advisorFactory.isAspect(beanType)) {
+					if (this.advisorFactory.isAspect(beanType)) {	//判断是Aspect bean类型
 						aspectNames.add(beanName);
 						AspectMetadata amd = new AspectMetadata(beanType, beanName);
 						if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
@@ -128,7 +123,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 						}
 					}
 				}
-				this.aspectBeanNames = aspectNames;
+				this.aspectBeanNames = aspectNames;		//缓存所有的aspect bean
 				return advisors;
 			}
 		}

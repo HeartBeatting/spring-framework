@@ -16,22 +16,16 @@
 
 package org.springframework.context.support;
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.EmbeddedValueResolverAware;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.*;
 import org.springframework.util.StringValueResolver;
+
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor}
@@ -83,7 +77,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		if (acc != null) {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				public Object run() {
-					invokeAwareInterfaces(bean);
+					invokeAwareInterfaces(bean);	//初始化bean的时候,给bean设置ApplicationContextAware等的引用
 					return null;
 				}
 			}, acc);

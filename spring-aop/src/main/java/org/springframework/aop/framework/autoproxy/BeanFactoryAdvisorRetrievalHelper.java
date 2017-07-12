@@ -16,18 +16,17 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.util.Assert;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Helper for retrieving standard Spring Advisors from a BeanFactory,
@@ -43,7 +42,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 	private final ConfigurableListableBeanFactory beanFactory;
 
-	private String[] cachedAdvisorBeanNames;
+	private String[] cachedAdvisorBeanNames;	//缓存所有切面Bean名称
 
 
 	/**

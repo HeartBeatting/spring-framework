@@ -16,24 +16,19 @@
 
 package org.springframework.transaction.config;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.w3c.dom.Element;
-
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
-import org.springframework.transaction.interceptor.NoRollbackRuleAttribute;
-import org.springframework.transaction.interceptor.RollbackRuleAttribute;
-import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.transaction.interceptor.*;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser
@@ -93,7 +88,7 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 	}
 
-	private RootBeanDefinition parseAttributeSource(Element attrEle, ParserContext parserContext) {
+	private RootBeanDefinition parseAttributeSource(Element attrEle, ParserContext parserContext) {		//用于解析 <tx:advice> -> <tx:attributes> -> <tx:method name="*" propagation="REQUIRED" rollback-for="Exception"/>
 		List<Element> methods = DomUtils.getChildElementsByTagName(attrEle, METHOD_ELEMENT);
 		ManagedMap<TypedStringValue, RuleBasedTransactionAttribute> transactionAttributeMap =
 			new ManagedMap<TypedStringValue, RuleBasedTransactionAttribute>(methods.size());

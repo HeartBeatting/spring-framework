@@ -16,16 +16,16 @@
 
 package org.springframework.aop.framework;
 
-import java.io.Serializable;
-
 import org.springframework.aop.SpringProxy;
+
+import java.io.Serializable;
 
 /**
  * Default {@link AopProxyFactory} implementation,
  * creating either a CGLIB proxy or a JDK dynamic proxy.
  *
  * <p>Creates a CGLIB proxy if one the following is true
- * for a given {@link AdvisedSupport} instance:
+ * for a given {@link AdvisedSupport} instance:				//三个要求符合一个就会使用Cglib代理
  * <ul>
  * <li>the "optimize" flag is set
  * <li>the "proxyTargetClass" flag is set
@@ -49,17 +49,17 @@ import org.springframework.aop.SpringProxy;
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 
-	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {	//创建Aop代理对象
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class targetClass = config.getTargetClass();
 			if (targetClass == null) {
 				throw new AopConfigException("TargetSource cannot determine target class: " +
 						"Either an interface or a target is required for proxy creation.");
 			}
-			if (targetClass.isInterface()) {
+			if (targetClass.isInterface()) {		//如果代理的是接口,仍然使用Jdk动态代理
 				return new JdkDynamicAopProxy(config);
 			}
-			return CglibProxyFactory.createCglibProxy(config);
+			return CglibProxyFactory.createCglibProxy(config);	//不是接口才会使用Cglib代理
 		}
 		else {
 			return new JdkDynamicAopProxy(config);

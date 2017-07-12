@@ -16,10 +16,6 @@
 
 package org.springframework.jdbc.datasource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionDefinition;
@@ -28,6 +24,10 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * {@link org.springframework.transaction.PlatformTransactionManager}
@@ -102,7 +102,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class DataSourceTransactionManager extends AbstractPlatformTransactionManager
 		implements ResourceTransactionManager, InitializingBean {
 
-	private DataSource dataSource;
+	private DataSource dataSource;	//jdk的数据源接口
 
 
 	/**
@@ -142,7 +142,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 * @see TransactionAwareDataSourceProxy
 	 * @see org.springframework.transaction.jta.JtaTransactionManager
 	 */
-	public void setDataSource(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {		//用于设置TransactionAwareDataSourceProxy代理类的
 		if (dataSource instanceof TransactionAwareDataSourceProxy) {
 			// If we got a TransactionAwareDataSourceProxy, we need to perform transactions
 			// for its underlying target DataSource, else data access code won't see
@@ -173,7 +173,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	}
 
 	@Override
-	protected Object doGetTransaction() {
+	protected Object doGetTransaction() {	//返回DataSourceTransactionObject对象
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
 		txObject.setSavepointAllowed(isNestedTransactionAllowed());
 		ConnectionHolder conHolder =

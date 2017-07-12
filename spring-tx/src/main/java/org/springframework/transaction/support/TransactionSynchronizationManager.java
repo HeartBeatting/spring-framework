@@ -78,7 +78,7 @@ public abstract class TransactionSynchronizationManager {
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
 	private static final ThreadLocal<Map<Object, Object>> resources =
-			new NamedThreadLocal<Map<Object, Object>>("Transactional resources");
+			new NamedThreadLocal<Map<Object, Object>>("Transactional resources");//用于存放Transactional resources?
 
 	private static final ThreadLocal<Set<TransactionSynchronization>> synchronizations =
 			new NamedThreadLocal<Set<TransactionSynchronization>>("Transaction synchronizations");
@@ -147,7 +147,7 @@ public abstract class TransactionSynchronizationManager {
 	 * Actually check the value of the resource that is bound for the given key.
 	 */
 	private static Object doGetResource(Object actualKey) {
-		Map<Object, Object> map = resources.get();
+		Map<Object, Object> map = resources.get();	//返回当前线程对应的ThreadLocal map中缓存的对象
 		if (map == null) {
 			return null;
 		}

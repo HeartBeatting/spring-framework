@@ -16,18 +16,18 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 /**
- * {@link AspectJAwareAdvisorAutoProxyCreator} subclass that processes all AspectJ
+ * {@link AspectJAwareAdvisorAutoProxyCreator} subclass that processes all AspectJ		(解析所有的AspectJ 注解)
  * annotation aspects in the current application context, as well as Spring Advisors.
  *
  * <p>Any AspectJ annotated classes will automatically be recognized, and their
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  * an include pattern will be considered as defining aspects to use for Spring auto-proxying.
  *
  * <p>Processing of Spring Advisors follows the rules established in
- * {@link org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator}.
+ * {@link org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator}.	(织入切面的规则和AbstractAdvisorAutoProxyCreator一样)
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -81,9 +81,9 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
-		// Add all the Spring advisors found according to superclass rules.
+		// Add all the Spring advisors found according to superclass rules.		//找到所有的切面
 		List<Advisor> advisors = super.findCandidateAdvisors();
-		// Build Advisors for all AspectJ aspects in the bean factory.
+		// Build Advisors for all AspectJ aspects in the bean factory.			//创建代理对象
 		advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
 		return advisors;
 	}

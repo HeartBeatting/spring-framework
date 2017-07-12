@@ -16,18 +16,9 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AopInfrastructureBean;
@@ -46,6 +37,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.util.ClassUtils;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
@@ -272,7 +271,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (beanName == null || !this.targetSourcedBeans.containsKey(beanName)) {
-			if (this.advisedBeans.containsKey(cacheKey)) {
+			if (this.advisedBeans.containsKey(cacheKey)) {	//已经有这个advise,则结束
 				return null;
 			}
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
@@ -288,9 +287,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 			TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
 			if (targetSource != null) {
 				this.targetSourcedBeans.put(beanName, Boolean.TRUE);
-				Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
-				Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
-				this.proxyTypes.put(cacheKey, proxy.getClass());
+				Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);	//找出bean对应的interceptors
+				Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);				//创建动态代理对象
+				this.proxyTypes.put(cacheKey, proxy.getClass());	//缓存下来
 				return proxy;
 			}
 		}
@@ -317,7 +316,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * identified as one to proxy by the subclass.
 	 * @see #getAdvicesAndAdvisorsForBean
 	 */
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {	//创建代理对象(代理对象包装了被代理对象)
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
 			if (!this.earlyProxyReferences.containsKey(cacheKey)) {
@@ -358,7 +357,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		}
 
 		// Create proxy if we have advice.
-		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);	//找出所有的interceptors
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
