@@ -34,6 +34,7 @@ import org.springframework.beans.factory.BeanNameAware;
  * @author Rob Harrop
  */
 @SuppressWarnings("serial")
+//DefaultAdvisorAutoProxyCreator以及几个兄弟类都是为了对bean做增强的,但是什么时候注册到beanPostProcesser map里的呢
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator implements BeanNameAware {
 
 	/** Separator between prefix and remainder of bean name */

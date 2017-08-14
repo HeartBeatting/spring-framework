@@ -69,9 +69,9 @@ public class BeanFactoryAdvisorRetrievalHelper {
 			if (advisorNames == null) {
 				// Do not initialize FactoryBeans here: We need to leave all regular beans
 				// uninitialized to let the auto-proxy creator apply to them!
-				advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
-						this.beanFactory, Advisor.class, true, false);
-				this.cachedAdvisorBeanNames = advisorNames;
+				advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(		//寻找bean,是根据前面生成的所有的bean definition,返回符合要求的bean names;
+						this.beanFactory, Advisor.class, true, false);		//寻找所有实现了Advisor接口的bean names,也就是找出所有的切面;事务和AOP都是切面bean;
+				this.cachedAdvisorBeanNames = advisorNames;					//缓存下来
 			}
 		}
 		if (advisorNames.length == 0) {
@@ -79,7 +79,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		}
 
 		List<Advisor> advisors = new LinkedList<Advisor>();
-		for (String name : advisorNames) {
+		for (String name : advisorNames) {		//根据上面的切面bean names,获取所有的拦截器bean
 			if (isEligibleBean(name)) {
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isDebugEnabled()) {
@@ -88,7 +88,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 				}
 				else {
 					try {
-						advisors.add(this.beanFactory.getBean(name, Advisor.class));
+						advisors.add(this.beanFactory.getBean(name, Advisor.class));	//用beanFactory 获取bean
 					}
 					catch (BeanCreationException ex) {
 						Throwable rootCause = ex.getMostSpecificCause();

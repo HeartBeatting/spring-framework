@@ -21,7 +21,7 @@ package org.springframework.transaction.support;
  * Supported by AbstractPlatformTransactionManager.
  *
  * <p>TransactionSynchronization implementations can implement the Ordered interface
- * to influence their execution order. A synchronization that does not implement the
+ * to influence their execution order. A synchronization that does not implement the	// 没有实现Ordered, 放到链的末尾
  * Ordered interface is appended to the end of the synchronization chain.
  *
  * <p>System synchronizations performed by Spring itself use specific order values,

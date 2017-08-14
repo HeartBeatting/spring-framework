@@ -16,24 +16,15 @@
 
 package org.springframework.transaction.support;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.core.Constants;
+import org.springframework.transaction.*;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.core.Constants;
-import org.springframework.transaction.IllegalTransactionStateException;
-import org.springframework.transaction.InvalidTimeoutException;
-import org.springframework.transaction.NestedTransactionNotSupportedException;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.TransactionSuspensionNotSupportedException;
-import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
  * Abstract base class that implements Spring's standard transaction workflow,
@@ -369,7 +360,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 				DefaultTransactionStatus status = newTransactionStatus(
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
-				doBegin(transaction, definition);
+				doBegin(transaction, definition);		//开始事务
 				prepareSynchronization(status, definition);
 				return status;
 			}
@@ -580,7 +571,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				Integer isolationLevel = TransactionSynchronizationManager.getCurrentTransactionIsolationLevel();
 				TransactionSynchronizationManager.setCurrentTransactionIsolationLevel(null);
 				boolean wasActive = TransactionSynchronizationManager.isActualTransactionActive();
-				TransactionSynchronizationManager.setActualTransactionActive(false);
+				TransactionSynchronizationManager.setActualTransactionActive(false);	//事务挂起,设置当前线程没有事务
 				return new SuspendedResourcesHolder(
 						suspendedResources, suspendedSynchronizations, name, readOnly, isolationLevel, wasActive);
 			}
@@ -785,16 +776,16 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			}
 			catch (Error err) {
 				if (!beforeCompletionInvoked) {
-					triggerBeforeCompletion(status);
+					triggerBeforeCompletion(status);	// 事务提交前要做的事情
 				}
 				doRollbackOnCommitException(status, err);
 				throw err;
 			}
 
 			// Trigger afterCommit callbacks, with an exception thrown there
-			// propagated to callers but the transaction still considered as committed.
+			// propagated to callers but the transaction still considered as committed.		// 能走到这里就任务事务提交成功了
 			try {
-				triggerAfterCommit(status);
+				triggerAfterCommit(status);		// 事务提交以后要做的事情
 			}
 			finally {
 				triggerAfterCompletion(status, TransactionSynchronization.STATUS_COMMITTED);
@@ -1003,7 +994,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	private void cleanupAfterCompletion(DefaultTransactionStatus status) {
 		status.setCompleted();
 		if (status.isNewSynchronization()) {
-			TransactionSynchronizationManager.clear();
+			TransactionSynchronizationManager.clear();	//清理事务标记
 		}
 		if (status.isNewTransaction()) {
 			doCleanupAfterCompletion(status.getTransaction());

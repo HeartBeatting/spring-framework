@@ -177,7 +177,7 @@ public class DefaultMessageListenerContainer extends AbstractPollingMessageListe
 	private int cacheLevel = CACHE_AUTO;
 
 	private int concurrentConsumers = 1;
-
+	//最大并发消费线程数
 	private int maxConcurrentConsumers = 1;
 
 	private int maxMessagesPerTask = Integer.MIN_VALUE;
@@ -489,20 +489,20 @@ public class DefaultMessageListenerContainer extends AbstractPollingMessageListe
 	@Override
 	public void initialize() {
 		// Adapt default cache level.
-		if (this.cacheLevel == CACHE_AUTO) {
+		if (this.cacheLevel == CACHE_AUTO) {	//设置缓存level
 			this.cacheLevel = (getTransactionManager() != null ? CACHE_NONE : CACHE_CONSUMER);
 		}
 
 		// Prepare taskExecutor and maxMessagesPerTask.
-		synchronized (this.lifecycleMonitor) {
-			if (this.taskExecutor == null) {
+		synchronized (this.lifecycleMonitor) {	//protected 的全局锁,防止并发修改线程池属性
+			if (this.taskExecutor == null) {	//没有线程池,则初始化消费消息的线程
 				this.taskExecutor = createDefaultTaskExecutor();
 			}
 			else if (this.taskExecutor instanceof SchedulingTaskExecutor &&
-					((SchedulingTaskExecutor) this.taskExecutor).prefersShortLivedTasks() &&
+					((SchedulingTaskExecutor) this.taskExecutor).prefersShortLivedTasks() &&	//适合短任务
 					this.maxMessagesPerTask == Integer.MIN_VALUE) {
 				// TaskExecutor indicated a preference for short-lived tasks. According to
-				// setMaxMessagesPerTask javadoc, we'll use 10 message per task in this case
+				// setMaxMessagesPerTask javadoc, we'll use 10 message per task in this case	//一个任务10条消息
 				// unless the user specified a custom value.
 				this.maxMessagesPerTask = 10;
 			}
@@ -1076,7 +1076,7 @@ public class DefaultMessageListenerContainer extends AbstractPollingMessageListe
 						}
 						wasWaiting = true;
 						try {
-							lifecycleMonitor.wait();
+							lifecycleMonitor.wait();	//wait就释放锁了,等待唤醒后,重新竞争锁
 						}
 						catch (InterruptedException ex) {
 							// Re-interrupt current thread, to allow other threads to react.

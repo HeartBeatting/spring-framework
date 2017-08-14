@@ -311,13 +311,19 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
+	 *
+	 * 解析普通的bean: <bean>...</bean>
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
-			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
+			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);	//如果需要的话就包装bean,在什么情况下需要包装bean?包装bean的意思就是为其生成代理对象,代理对象包装了目标对象?
 			try {
 				// Register the final decorated instance.
+				/**
+				 * 注册BeanDefinition, 注册就是把BeanDefinitionHolder放到对应的map里,map里维护了全量的BeanDefinition;
+				 * 这些全量的BeanDefinition 用于后续的Bean创建
+				 */
 				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
 			}
 			catch (BeanDefinitionStoreException ex) {

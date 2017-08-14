@@ -365,8 +365,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
-		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
-			result = beanProcessor.postProcessAfterInitialization(result, beanName);	//这里可以对bean进行包装(实现拦截器,事务等功能) @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.postProcessAfterInitialization()
+		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {	// getBeanPostProcessors() 获取所有的Bean后置处理器 (包括了切面增强,事务增强等)
+			// 这里可以对bean进行包装(实现拦截器,事务等功能)
+			// @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.postProcessAfterInitialization()
+			result = beanProcessor.postProcessAfterInitialization(result, beanName);
 			if (result == null) {
 				return result;
 			}

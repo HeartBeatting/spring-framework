@@ -51,7 +51,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	private static final String ASPECT = "aspect";
 	private static final String EXPRESSION = "expression";
 	private static final String ID = "id";
-	private static final String POINTCUT = "pointcut";
+	private static final String POINTCUT = "pointcut";					//切点,用来匹配method,注解等,生成拦截器代理的
 	private static final String ADVICE_BEAN_NAME = "adviceBeanName";
 	private static final String ADVISOR = "advisor";
 	private static final String ADVICE_REF = "advice-ref";
@@ -83,7 +83,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	private ParseState parseState = new ParseState();
 
 
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
+	public BeanDefinition parse(Element element, ParserContext parserContext) {		//解析aop标签
 		CompositeComponentDefinition compositeDef =
 				new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
@@ -93,13 +93,13 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		List<Element> childElts = DomUtils.getChildElements(element);
 		for (Element elt: childElts) {	//<aop:config 下面的子元素
 			String localName = parserContext.getDelegate().getLocalName(elt);
-			if (POINTCUT.equals(localName)) {
-				parsePointcut(elt, parserContext);
+			if (POINTCUT.equals(localName)) {	//PointCut
+				parsePointcut(elt, parserContext);	//解析PointCut
 			}
-			else if (ADVISOR.equals(localName)) {
+			else if (ADVISOR.equals(localName)) {	//advisor
 				parseAdvisor(elt, parserContext);
 			}
-			else if (ASPECT.equals(localName)) {
+			else if (ASPECT.equals(localName)) {	//aspect
 				parseAspect(elt, parserContext);
 			}
 		}
@@ -159,7 +159,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 	 * parse any associated '{@code pointcut}' or '{@code pointcut-ref}' attributes.
 	 */
 	private AbstractBeanDefinition createAdvisorBeanDefinition(Element advisorElement, ParserContext parserContext) {
-		RootBeanDefinition advisorDefinition = new RootBeanDefinition(DefaultBeanFactoryPointcutAdvisor.class);
+		RootBeanDefinition advisorDefinition = new RootBeanDefinition(DefaultBeanFactoryPointcutAdvisor.class);		// 创建的代理对象objectType为DefaultBeanFactoryPointcutAdvisor
 		advisorDefinition.setSource(parserContext.extractSource(advisorElement));
 
 		String adviceRef = advisorElement.getAttribute(ADVICE_REF);
@@ -426,7 +426,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 		try {
 			this.parseState.push(new PointcutEntry(id));
-			pointcutDefinition = createPointcutDefinition(expression);
+			pointcutDefinition = createPointcutDefinition(expression);	//根据expression表达式创建PointcutDefinition
 			pointcutDefinition.setSource(parserContext.extractSource(pointcutElement));
 
 			String pointcutBeanName = id;

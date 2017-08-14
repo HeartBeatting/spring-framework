@@ -16,19 +16,15 @@
 
 package org.springframework.beans.factory.support;
 
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
+
+import java.security.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Support base class for singleton registries which need to handle
@@ -98,31 +94,31 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
 				Object object = this.factoryBeanObjectCache.get(beanName);
-				if (object == null) {
+				if (object == null) {		//第一次进这个方法object就是null的,需要创建对象,并缓存下来
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
-					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
+					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);	//todo,这里好像是为了处理循环引用的?
 					if (alreadyThere != null) {
-						object = alreadyThere;
+						object = alreadyThere;	//alreadyThere不为空,object 直接等于 alreadyThere
 					}
-					else {
+					else {	//alreadyThere 会为空,则需要创建并缓存
 						if (object != null && shouldPostProcess) {
 							try {
-								object = postProcessObjectFromFactoryBean(object, beanName);
+								object = postProcessObjectFromFactoryBean(object, beanName);	//对bean进行包装,增强
 							}
 							catch (Throwable ex) {
 								throw new BeanCreationException(beanName,
 										"Post-processing of FactoryBean's singleton object failed", ex);
 							}
 						}
-						this.factoryBeanObjectCache.put(beanName, (object != null ? object : NULL_OBJECT));
+						this.factoryBeanObjectCache.put(beanName, (object != null ? object : NULL_OBJECT));		//缓存下来
 					}
 				}
 				return (object != NULL_OBJECT ? object : null);
 			}
 		}
-		else {
+		else {	//不是单例,直接创建,并返回
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (object != null && shouldPostProcess) {
 				try {

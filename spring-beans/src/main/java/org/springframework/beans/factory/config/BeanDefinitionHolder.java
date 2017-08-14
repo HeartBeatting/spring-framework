@@ -22,7 +22,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Holder for a BeanDefinition with name and aliases.
+ * Holder for a BeanDefinition with name and aliases.					//用于持有BeanDefinition,bean名称,和bean别名List
  * Can be registered as a placeholder for an inner bean.
  *
  * <p>Can also be used for programmatic registration of inner bean

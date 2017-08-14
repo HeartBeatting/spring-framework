@@ -131,7 +131,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
 				// Create the TransactionAttributeSourceAdvisor definition.
-				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryTransactionAttributeSourceAdvisor.class);
+				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryTransactionAttributeSourceAdvisor.class);	//定义ProxyBeanFactory getObject 为 BeanFactoryTransactionAttributeSourceAdvisor
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				advisorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
@@ -139,13 +139,13 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				if (element.hasAttribute("order")) {
 					advisorDef.getPropertyValues().add("order", element.getAttribute("order"));
 				}
-				parserContext.getRegistry().registerBeanDefinition(txAdvisorBeanName, advisorDef);
+				parserContext.getRegistry().registerBeanDefinition(txAdvisorBeanName, advisorDef);	//注册RootBeanDefinition
 
 				CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), eleSource);
-				compositeDef.addNestedComponent(new BeanComponentDefinition(sourceDef, sourceName));
-				compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));
-				compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, txAdvisorBeanName));
-				parserContext.registerComponent(compositeDef);
+				compositeDef.addNestedComponent(new BeanComponentDefinition(sourceDef, sourceName));			//AnnotationTransactionAttributeSource
+				compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));	//TransactionInterceptor
+				compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, txAdvisorBeanName));	//RootBeanDefinition BeanFactoryTransactionAttributeSourceAdvisor
+				parserContext.registerComponent(compositeDef);	//也是一个注册,好像是注册上面三者之间的关系
 			}
 		}
 	}

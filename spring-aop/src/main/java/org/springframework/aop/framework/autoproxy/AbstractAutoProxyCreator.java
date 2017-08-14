@@ -348,7 +348,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		if (beanName != null && this.targetSourcedBeans.containsKey(beanName)) {
 			return bean;
 		}
-		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {	//没有代理,直接返回
 			return bean;
 		}
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
@@ -356,8 +356,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 			return bean;
 		}
 
-		// Create proxy if we have advice.
-		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);	//找出所有的interceptors
+		// Create proxy if we have advice.	//找出所有的interceptors,创建的代理对象会调用这些拦截器(Aop切面,事务等都需要这个)
+		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));

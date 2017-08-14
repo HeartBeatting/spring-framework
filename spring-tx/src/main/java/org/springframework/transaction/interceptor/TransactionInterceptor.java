@@ -93,7 +93,7 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
 		return invokeWithinTransaction(invocation.getMethod(), targetClass, new InvocationCallback() {
 			public Object proceedWithInvocation() throws Throwable {
-				return invocation.proceed();
+				return invocation.proceed();	//在事务控制下调用业务逻辑,如果在开启事务的情况下,操作数据库,都不会立马提交事务,都是在finally里面提交事务
 			}
 		});
 	}

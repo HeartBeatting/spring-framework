@@ -61,18 +61,18 @@ public @interface Transactional {
 	 * {@link org.springframework.transaction.PlatformTransactionManager}
 	 * bean definition.
 	 */
-	String value() default "";
+	String value() default "";	// 用于指定特定的事务管理器
 
 	/**
-	 * The transaction propagation type.
-	 * Defaults to {@link Propagation#REQUIRED}.
+	 * The transaction propagation type.			//用于指定事务的传播级别
+	 * Defaults to {@link Propagation#REQUIRED}.	//如果有事务,就加入其中;如果没有事务,就新建一个事务;
 	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getPropagationBehavior()
 	 */
 	Propagation propagation() default Propagation.REQUIRED;
 
 	/**
-	 * The transaction isolation level.
-	 * Defaults to {@link Isolation#DEFAULT}.
+	 * The transaction isolation level.				//用于指定事务隔离级别
+	 * Defaults to {@link Isolation#DEFAULT}.		//默认采用数据库的默认隔离级别
 	 * @see org.springframework.transaction.interceptor.TransactionAttribute#getIsolationLevel()
 	 */
 	Isolation isolation() default Isolation.DEFAULT;

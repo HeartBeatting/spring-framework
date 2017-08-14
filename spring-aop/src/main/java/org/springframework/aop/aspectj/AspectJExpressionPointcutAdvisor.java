@@ -17,6 +17,7 @@
 package org.springframework.aop.aspectj;
 
 import org.springframework.aop.Pointcut;
+import org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator;
 import org.springframework.aop.support.AbstractGenericPointcutAdvisor;
 
 /**
@@ -24,6 +25,9 @@ import org.springframework.aop.support.AbstractGenericPointcutAdvisor;
  *
  * @author Rob Harrop
  * @since 2.0
+ *
+ * 当定义一个AspectJExpressionPointcutAdvisor Bean时, 这是一个 Advisor, 会被Spring扫描到,并创建相应的代理;
+ * @see AbstractAutoProxyCreator#wrapIfNecessary(java.lang.Object, java.lang.String, java.lang.Object)
  */
 @SuppressWarnings("serial")
 public class AspectJExpressionPointcutAdvisor extends AbstractGenericPointcutAdvisor {

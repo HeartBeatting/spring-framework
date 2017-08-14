@@ -113,7 +113,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating JDK dynamic proxy: target source is " + this.advised.getTargetSource());
 		}
-		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);	//补充代理的接口
+		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised);	//补充代理的接口,必须要实现SpringProxy.class和Advised.class接口
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
 		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);	//创建jdk动态代理对象
 	}
@@ -186,7 +186,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 
 			// Get the interception chain for this method.
-			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
+			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);	//获取拦截器链
 
 			// Check whether we have any advice. If we don't, we can fallback on direct
 			// reflective invocation of the target, and avoid creating a MethodInvocation.
@@ -198,9 +198,9 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 			else {
 				// We need to create a method invocation...
-				invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
+				invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);	//创建ReflectiveMethodInvocation
 				// Proceed to the joinpoint through the interceptor chain.
-				retVal = invocation.proceed();
+				retVal = invocation.proceed();	//依次调用拦截器链
 			}
 
 			// Massage return value if necessary.

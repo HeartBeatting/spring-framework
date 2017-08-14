@@ -59,7 +59,7 @@ public interface FactoryBean<T> {
 	 * Singleton and Prototype design pattern.
 	 * <p>If this FactoryBean is not fully initialized yet at the time of
 	 * the call (for example because it is involved in a circular reference),
-	 * throw a corresponding {@link FactoryBeanNotInitializedException}.
+	 * throw a corresponding {@link FactoryBeanNotInitializedException}.	//
 	 * <p>As of Spring 2.0, FactoryBeans are allowed to return {@code null}
 	 * objects. The factory will consider this as normal value to be used; it
 	 * will not throw a FactoryBeanNotInitializedException in this case anymore.

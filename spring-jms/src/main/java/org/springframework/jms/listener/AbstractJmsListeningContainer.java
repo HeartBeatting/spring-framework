@@ -16,12 +16,6 @@
 
 package org.springframework.jms.listener;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import javax.jms.Connection;
-import javax.jms.JMSException;
-
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.SmartLifecycle;
@@ -30,6 +24,12 @@ import org.springframework.jms.connection.ConnectionFactoryUtils;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.destination.JmsDestinationAccessor;
 import org.springframework.util.ClassUtils;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Common base class for all containers which need to implement listening
@@ -195,7 +195,7 @@ public abstract class AbstractJmsListeningContainer extends JmsDestinationAccess
 		}
 		catch (JMSException ex) {
 			synchronized (this.sharedConnectionMonitor) {
-				ConnectionFactoryUtils.releaseConnection(this.sharedConnection, getConnectionFactory(), this.autoStartup);
+				ConnectionFactoryUtils.releaseConnection(this.sharedConnection, getConnectionFactory(), this.autoStartup);	//把连接做成一个工厂方法,方便使用
 				this.sharedConnection = null;
 			}
 			throw convertJmsAccessException(ex);

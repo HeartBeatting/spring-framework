@@ -16,8 +16,8 @@
 
 package org.springframework.aop.config;
 
-import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
+import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
@@ -52,12 +52,25 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author Juergen Hoeller
  * @since 2.0
  */
+
+/**
+ * Aop切面可以通过注解或者xml配置实现; xml配置会用到aop标签等: <aop:aspect> ...
+ * 这个是Aop标签的解析类,用于解析xml中定义的切面Advisor,切点PointCut,增强Advice等
+ *
+ * xml解析的步骤
+ * 1.先把xml中的所有配置都load到内存中,生成对应的RootBeanDefinition
+ * 2.遍历所有的RootBeanDefinition,如果用到的命名空间不是默认的,就获取对应的解析器(NamespaceHandlerSupport),解析bean
+ */
 public class AopNamespaceHandler extends NamespaceHandlerSupport {
 
 	/**
 	 * Register the {@link BeanDefinitionParser BeanDefinitionParsers} for the
 	 * '{@code config}', '{@code spring-configured}', '{@code aspectj-autoproxy}'
 	 * and '{@code scoped-proxy}' tags.
+	 */
+	/**
+	 * init()方法是在
+	 * @see DefaultNamespaceHandlerResolver#resolve(java.lang.String)
 	 */
 	public void init() {
 		// In 2.0 XSD as well as in 2.1 XSD.

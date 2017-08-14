@@ -32,7 +32,7 @@ public enum Propagation {
 	/**
 	 * Support a current transaction, create a new one if none exists.
 	 * Analogous to EJB transaction attribute of the same name.
-	 * <p>This is the default setting of a transaction annotation.
+	 * <p>This is the default setting of a transaction annotation.		//默认的事务传播级别
 	 */
 	REQUIRED(TransactionDefinition.PROPAGATION_REQUIRED),
 

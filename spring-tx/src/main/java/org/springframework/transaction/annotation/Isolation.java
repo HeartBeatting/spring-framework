@@ -30,7 +30,7 @@ import org.springframework.transaction.TransactionDefinition;
 public enum Isolation {
 
 	/**
-	 * Use the default isolation level of the underlying datastore.
+	 * Use the default isolation level of the underlying datastore.		//使用当前数据库的默认隔离级别
 	 * All other levels correspond to the JDBC isolation levels.
 	 * @see java.sql.Connection
 	 */

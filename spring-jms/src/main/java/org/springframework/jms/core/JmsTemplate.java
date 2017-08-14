@@ -16,18 +16,6 @@
 
 package org.springframework.jms.core;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.QueueBrowser;
-import javax.jms.Session;
-
 import org.springframework.jms.JmsException;
 import org.springframework.jms.connection.ConnectionFactoryUtils;
 import org.springframework.jms.connection.JmsResourceHolder;
@@ -37,6 +25,9 @@ import org.springframework.jms.support.converter.SimpleMessageConverter;
 import org.springframework.jms.support.destination.JmsDestinationAccessor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
+
+import javax.jms.*;
+import java.lang.IllegalStateException;
 
 /**
  * Helper class that simplifies synchronous JMS access code.
@@ -450,7 +441,7 @@ public class JmsTemplate extends JmsDestinationAccessor implements JmsOperations
 		Connection conToClose = null;
 		Session sessionToClose = null;
 		try {
-			Session sessionToUse = ConnectionFactoryUtils.doGetTransactionalSession(
+			Session sessionToUse = ConnectionFactoryUtils.doGetTransactionalSession(		//是否在事务里发送消息,就是这里有区别, todo
 					getConnectionFactory(), this.transactionalResourceFactory, startConnection);
 			if (sessionToUse == null) {
 				conToClose = createConnection();

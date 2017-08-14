@@ -16,18 +16,17 @@
 
 package org.springframework.aop.framework;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.ProxyMethodInvocation;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.core.BridgeMethodResolver;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-
-import org.springframework.aop.ProxyMethodInvocation;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.core.BridgeMethodResolver;
 
 /**
  * Spring's implementation of the AOP Alliance
@@ -146,8 +145,9 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 
 	public Object proceed() throws Throwable {
 		//	We start with an index of -1 and increment early.
+		// 初始currentInterceptorIndex为-1
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
-			return invokeJoinpoint();
+			return invokeJoinpoint();	//没有剩余的拦截器,直接反射调用method,返回结果
 		}
 
 		Object interceptorOrInterceptionAdvice =
@@ -157,13 +157,13 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 			// been evaluated and found to match.
 			InterceptorAndDynamicMethodMatcher dm =
 					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
-			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {
+			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {	//判断method方法是否需要拦截
 				return dm.interceptor.invoke(this);
 			}
 			else {
 				// Dynamic matching failed.
 				// Skip this interceptor and invoke the next in the chain.
-				return proceed();
+				return proceed();	//递归调用proceed()方法,直到拦截器都执行过了
 			}
 		}
 		else {

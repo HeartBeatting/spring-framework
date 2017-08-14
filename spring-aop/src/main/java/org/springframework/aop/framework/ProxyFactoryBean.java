@@ -227,8 +227,8 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * @return a fresh AOP proxy reflecting the current state of this factory
 	 */
 	public Object getObject() throws BeansException {
-		initializeAdvisorChain();	//初始化增强链(拦截器,前置增强等..) ,todo
-		if (isSingleton()) {		//支持配置成单例或者是多例的,多例每次都新建一个实例
+		initializeAdvisorChain();	// 初始化增强链(拦截器,前置增强等..)
+		if (isSingleton()) {		// 支持配置成单例或者是多例的,多例每次都新建一个实例
 			return getSingletonInstance();	//实例化FactoryBean时会调用getObject(),所以会缓存advice对象
 		}
 		else {

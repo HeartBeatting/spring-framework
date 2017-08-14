@@ -1430,9 +1430,10 @@ public class BeanDefinitionParserDelegate {
 			Node node, BeanDefinitionHolder originalDef, BeanDefinition containingBd) {
 
 		String namespaceUri = getNamespaceURI(node);
-		if (!isDefaultNamespace(namespaceUri)) {	//不是默认命名空间的,需要找到xsd解析器,解析bean xml配置
-			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
-			if (handler != null) {
+		if (!isDefaultNamespace(namespaceUri)) {
+			NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);//不是默认命名空间的,需要找到xsd解析器,解析bean xml配置
+			if (handler != null) {	//找到了解析器,就对原来的bean进行装饰/包装,然后返回包装后的对象
+				//handler在解析aop之类的标签时都是继承NamespaceHandlerSupport的
 				return handler.decorate(node, originalDef, new ParserContext(this.readerContext, this, containingBd));
 			}
 			else if (namespaceUri != null && namespaceUri.startsWith("http://www.springframework.org/")) {
@@ -1445,7 +1446,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 		}
-		return originalDef;
+		return originalDef;	//如果是默认的命名空间,也就是<beans>...</beans>直接返回原来的originalDef
 	}
 
 	private BeanDefinitionHolder parseNestedCustomElement(Element ele, BeanDefinition containingBd) {

@@ -91,11 +91,20 @@ public abstract class AbstractInterceptorDrivenBeanDefinitionDecorator implement
 				proxyDefinition.copyQualifiersFrom((AbstractBeanDefinition) targetDefinition);
 			}
 			// wrap it in a BeanDefinitionHolder with bean name
+			/**
+			 * 将原来的existingBeanName bean 包装成一个新的proxyDefinition对象
+			 * 后续创建单例bean时,会调用getObject()方法生成实例bean
+			 */
 			result = new BeanDefinitionHolder(proxyDefinition, existingBeanName);
 		}
 
-		addInterceptorNameToList(interceptorName, result.getBeanDefinition());	//增加拦截器bean的名称
-		return result;
+		/**
+		 * 增加拦截器bean list 的名称,
+		 * 返回的BeanDefinitionHolder,用于生成对应的bean, BeanName还是原来的bean,但是beanDefinition已经是包装后的代理对象了
+		 * 在调用代理对象的时候,会依次掉用拦截器bean的
+		 */
+		addInterceptorNameToList(interceptorName, result.getBeanDefinition());
+		return result;	//返回新的对象
 	}
 
 	@SuppressWarnings("unchecked")

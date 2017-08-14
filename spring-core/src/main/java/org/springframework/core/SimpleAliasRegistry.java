@@ -38,7 +38,7 @@ import org.springframework.util.StringValueResolver;
 public class SimpleAliasRegistry implements AliasRegistry {
 
 	/** Map from alias to canonical name */
-	private final Map<String, String> aliasMap = new ConcurrentHashMap<String, String>(16);
+	private final Map<String, String> aliasMap = new ConcurrentHashMap<String, String>(16);		//维护别名和标准名称的映射
 
 
 	public void registerAlias(String name, String alias) {
@@ -150,7 +150,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		// Handle aliasing...
 		String resolvedName;
 		do {
-			resolvedName = this.aliasMap.get(canonicalName);
+			resolvedName = this.aliasMap.get(canonicalName);	//找到别名的标准名称bean
 			if (resolvedName != null) {
 				canonicalName = resolvedName;
 			}

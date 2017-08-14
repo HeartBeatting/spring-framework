@@ -198,29 +198,29 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 		try {
 			if (txObject.getConnectionHolder() == null ||
-					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
+					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {	//没有连接,获取数据库连接
 				Connection newCon = this.dataSource.getConnection();
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
-				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
+				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);		//缓存数据库连接
 			}
 
 			txObject.getConnectionHolder().setSynchronizedWithTransaction(true);
 			con = txObject.getConnectionHolder().getConnection();
 
 			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);
-			txObject.setPreviousIsolationLevel(previousIsolationLevel);
+			txObject.setPreviousIsolationLevel(previousIsolationLevel);					//缓存老的IsolationLevel
 
 			// Switch to manual commit if necessary. This is very expensive in some JDBC drivers,
 			// so we don't want to do it unnecessarily (for example if we've explicitly
 			// configured the connection pool to set it already).
 			if (con.getAutoCommit()) {
-				txObject.setMustRestoreAutoCommit(true);
+				txObject.setMustRestoreAutoCommit(true);	//必须重置为自动提交事务
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
-				con.setAutoCommit(false);
+				con.setAutoCommit(false);		//接收Spring的事务管理,必须设置为手工管理事务
 			}
 			txObject.getConnectionHolder().setTransactionActive(true);
 
@@ -229,7 +229,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				txObject.getConnectionHolder().setTimeoutInSeconds(timeout);
 			}
 
-			// Bind the session holder to the thread.
+			// Bind the session holder to the thread.	//和当前线程绑定
 			if (txObject.isNewConnectionHolder()) {
 				TransactionSynchronizationManager.bindResource(getDataSource(), txObject.getConnectionHolder());
 			}

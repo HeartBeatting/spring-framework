@@ -448,15 +448,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
-			//初始化properties配置到内存中,准备运行环境等
+			// 初始化properties配置到内存中,准备运行环境等
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			//获取一个新的工厂
+			// 获取一个新的工厂
+			// obtainFreshBeanFactory() ==> refreshBeanFactory() ==> loadBeanDefinitions(beanFactory) 会将xml中的配置都加载到内存中,用于后续的bean创建
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			//准备BeanFactory
+			// 准备BeanFactory
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -465,11 +466,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				//主要是获取实现了 BeanFactoryPostProcessor的子类, 并执行postProcessBeanFactory方法
+				// 主要是获取实现了 BeanFactoryPostProcessor的子类, 并执行postProcessBeanFactory方法
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				//todo 注册intercept processers?
+				// todo 注册intercept processers?
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -485,7 +486,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				//实例化所有非懒加载的单例Bean
+				// 实例化所有非懒加载的单例Bean (根据前面loadBeanDefinitions(beanFactory) 维护的全量的 BeanDefinition 创建Bean并且缓存下来)
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -629,7 +630,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessors =
 					new LinkedList<BeanDefinitionRegistryPostProcessor>();    //BeanDefinitionRegistryPostProcessor
 			for (BeanFactoryPostProcessor postProcessor : getBeanFactoryPostProcessors()) {		//getBeanFactoryPostProcessors?
-				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {		//为什么优先处理BeanDefinitionRegistryPostProcessor
+				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {		//为什么优先处理BeanDefinitionRegistryPostProcessor? 比如mybatis scaner就是实现这个做到先实现mapper的bean
 					BeanDefinitionRegistryPostProcessor registryPostProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
@@ -844,7 +845,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
-			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
+			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);	//没有就注册一个Multicaster Bean
 			if (logger.isDebugEnabled()) {
 				logger.debug("Unable to locate ApplicationEventMulticaster with name '" +
 						APPLICATION_EVENT_MULTICASTER_BEAN_NAME +
@@ -868,7 +869,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
-			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
+			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();	//没有就new一个DefaultLifecycleProcessor
 			defaultProcessor.setBeanFactory(beanFactory);
 			this.lifecycleProcessor = defaultProcessor;
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);

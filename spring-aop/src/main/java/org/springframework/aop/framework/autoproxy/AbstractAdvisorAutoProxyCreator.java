@@ -16,8 +16,6 @@
 
 package org.springframework.aop.framework.autoproxy;
 
-import java.util.List;
-
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
@@ -25,8 +23,10 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.OrderComparator;
 
+import java.util.List;
+
 /**
- * Generic auto proxy creator that builds AOP proxies for specific beans
+ * Generic auto proxy creator that builds AOP proxies for specific beans		//自动创建aop代理对象
  * based on detected Advisors for each bean.
  *
  * <p>Subclasses must implement the abstract {@link #findCandidateAdvisors()}
@@ -35,9 +35,9 @@ import org.springframework.core.OrderComparator;
  * objects from auto-proxying.
  *
  * <p>Advisors or advices requiring ordering should implement the
- * {@link org.springframework.core.Ordered} interface. This class sorts
+ * {@link org.springframework.core.Ordered} interface. This class sorts			//按Ordered排序
  * Advisors by Ordered order value. Advisors that don't implement the
- * Ordered interface will be considered as unordered; they will appear
+ * Ordered interface will be considered as unordered; they will appear			//没有定义顺序的会出现在拦截器链的末尾
  * at the end of the advisor chain in undefined order.
  *
  * @author Rod Johnson
@@ -84,8 +84,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class beanClass, String beanName) {
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();
-		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();		//找到所有的实现了Advisor.class接口的
+		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);	//找到适合当前bean的拦截器
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
@@ -111,13 +111,13 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see ProxyCreationContext#getCurrentProxiedBeanName()
 	 */
 	protected List<Advisor> findAdvisorsThatCanApply(
-			List<Advisor> candidateAdvisors, Class beanClass, String beanName) {
+			List<Advisor> candidateAdvisors, Class beanClass, String beanName) {	//找出适用于当前bean的拦截器
 
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
 			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
 		}
-		finally {
+		finally {	//ThreadLocal变量要在finally里清空
 			ProxyCreationContext.setCurrentProxiedBeanName(null);
 		}
 	}

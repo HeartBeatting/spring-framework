@@ -61,12 +61,12 @@ public abstract class TransactionSynchronizationUtils {
 		Assert.notNull(resource, "Resource must not be null");
 		Object resourceRef = resource;
 		// unwrap infrastructure proxy		获取InfrastructureProxy对象的包装对象
-		if (resourceRef instanceof InfrastructureProxy) {
+		if (resourceRef instanceof InfrastructureProxy) {	//获取代理的对象
 			resourceRef = ((InfrastructureProxy) resourceRef).getWrappedObject();
 		}
 		if (aopAvailable) {
 			// now unwrap scoped proxy
-			resourceRef = ScopedProxyUnwrapper.unwrapIfNecessary(resourceRef);
+			resourceRef = ScopedProxyUnwrapper.unwrapIfNecessary(resourceRef);	//获取Aop代理的目标对象
 		}
 		return resourceRef;
 	}
