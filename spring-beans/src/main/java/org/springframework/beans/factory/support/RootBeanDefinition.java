@@ -16,16 +16,16 @@
 
 package org.springframework.beans.factory.support;
 
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.util.Assert;
+
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A root bean definition represents the merged bean definition that backs
@@ -76,7 +76,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	boolean postProcessed = false;
 
 	/** Package-visible field that indicates a before-instantiation post-processor having kicked in */
-	volatile Boolean beforeInstantiationResolved;
+	volatile Boolean beforeInstantiationResolved;	//包级别私有的域, 表示before-instantiation post-processor是否运行过了
 
 	private Set<Member> externallyManagedConfigMembers;
 

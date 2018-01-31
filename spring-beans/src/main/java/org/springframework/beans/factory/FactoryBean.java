@@ -50,8 +50,9 @@ package org.springframework.beans.factory;
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
  */
-public interface FactoryBean<T> {
-
+public interface FactoryBean<T> {	// FactoryBean需要和BeanFactory区分一下
+	// FactoryBean的getObject方法可以获取到bean
+	// Mybatis就是利用FactoryBean生成mapper的代理对象的
 	/**
 	 * Return an instance (possibly shared or independent) of the object
 	 * managed by this factory.

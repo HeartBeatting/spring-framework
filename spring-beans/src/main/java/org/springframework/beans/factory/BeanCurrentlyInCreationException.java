@@ -18,7 +18,7 @@ package org.springframework.beans.factory;
 
 /**
  * Exception thrown in case of a reference to a bean that's currently in creation.
- * Typically happens when constructor autowiring matches the currently constructed bean.
+ * Typically happens when constructor autowiring matches the currently constructed bean.	// 在构造方法注入时遇到循环注入,才会抛出这个异常.
  *
  * @author Juergen Hoeller
  * @since 1.1

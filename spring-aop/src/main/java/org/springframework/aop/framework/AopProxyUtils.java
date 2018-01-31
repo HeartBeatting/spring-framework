@@ -87,7 +87,7 @@ public abstract class AopProxyUtils {
 				specifiedInterfaces = new Class[] {targetClass};
 			}
 		}
-		boolean addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);	//没有实现SpringProxy接口
+		boolean addSpringProxy = !advised.isInterfaceProxied(SpringProxy.class);	//没有实现SpringProxy接口,SpringProxy是用来表示一个对象是由Spring创建的代理对象
 		boolean addAdvised = !advised.isOpaque() && !advised.isInterfaceProxied(Advised.class);		//没有实现Advised接口
 		int nonUserIfcCount = 0;
 		if (addSpringProxy) {
@@ -102,7 +102,7 @@ public abstract class AopProxyUtils {
 			proxiedInterfaces[specifiedInterfaces.length] = SpringProxy.class;	//实现SpringProxy接口
 		}
 		if (addAdvised) {
-			proxiedInterfaces[proxiedInterfaces.length - 1] = Advised.class;	//实现Advised接口
+			proxiedInterfaces[proxiedInterfaces.length - 1] = Advised.class;	//实现Advised接口,强制实现Advised接口,然后代理对象就会有Advised里的这些方法了
 		}
 		return proxiedInterfaces;
 	}

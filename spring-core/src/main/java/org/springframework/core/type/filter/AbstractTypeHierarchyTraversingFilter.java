@@ -16,11 +16,11 @@
 
 package org.springframework.core.type.filter;
 
-import java.io.IOException;
-
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+
+import java.io.IOException;
 
 /**
  * Type filter that is aware of traversing over hierarchy.
@@ -63,7 +63,7 @@ public abstract class AbstractTypeHierarchyTraversingFilter implements TypeFilte
 		if (!this.considerInherited) {
 			return false;
 		}
-		if (metadata.hasSuperClass()) {
+		if (metadata.hasSuperClass()) {		//considerInherited为true,需要考虑父类
 			// Optimization to avoid creating ClassReader for super class.
 			Boolean superClassMatch = matchSuperClass(metadata.getSuperClassName());
 			if (superClassMatch != null) {

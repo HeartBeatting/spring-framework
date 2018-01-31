@@ -33,10 +33,10 @@ import java.io.Serializable;
  * </ul>
  *
  * <p>Note that the CGLIB library classes have to be present on
- * the class path if an actual CGLIB proxy needs to be created.
+ * the class path if an actual CGLIB proxy needs to be created.			// 如果需要创建cglib代理,必须依赖cglib的jar包
  *
- * <p>In general, specify "proxyTargetClass" to enforce a CGLIB proxy,
- * or specify one or more interfaces to use a JDK dynamic proxy.
+ * <p>In general, specify "proxyTargetClass" to enforce a CGLIB proxy,	// 一般的,指定proxyTargetClass为true,来强制使用cglib动态代理
+ * or specify one or more interfaces to use a JDK dynamic proxy.		// 或者指定一个或者多个接口,使用jdk动态代理
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -49,17 +49,17 @@ import java.io.Serializable;
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 
-	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {	//创建Aop代理对象
-		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
-			Class targetClass = config.getTargetClass();
-			if (targetClass == null) {
+	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {	// 创建Aop代理对象
+		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {	// isOptimize isProxyTargetClass都是配置选项
+			Class targetClass = config.getTargetClass();														// isOptimize默认false,可以指定ProxyFactoryBean配置isOptimize为true
+			if (targetClass == null) {													// 没有目标对象,抛异常
 				throw new AopConfigException("TargetSource cannot determine target class: " +
 						"Either an interface or a target is required for proxy creation.");
 			}
-			if (targetClass.isInterface()) {		//如果代理的是接口,仍然使用Jdk动态代理
+			if (targetClass.isInterface()) {		// 即使开启了使用cglib代理, 如果targetClass是接口, 仍然使用Jdk动态代理
 				return new JdkDynamicAopProxy(config);
 			}
-			return CglibProxyFactory.createCglibProxy(config);	//不是接口才会使用Cglib代理
+			return CglibProxyFactory.createCglibProxy(config);	// 不是接口才会使用Cglib代理
 		}
 		else {
 			return new JdkDynamicAopProxy(config);

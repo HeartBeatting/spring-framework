@@ -40,12 +40,12 @@ import java.util.List;
  * the AopProxy. Dynamic proxies <i>cannot</i> be used to proxy methods
  * defined in classes, rather than interfaces.
  *
- * <p>Objects of this type should be obtained through proxy factories,
+ * <p>Objects of this type should be obtained through proxy factories,		// jdk动态代理应该通过代理工厂获取
  * configured by an {@link AdvisedSupport} class. This class is internal
- * to Spring's AOP framework and need not be used directly by client code.
+ * to Spring's AOP framework and need not be used directly by client code.	// 这个类不对外暴露,是spring的内部使用的类
  *
- * <p>Proxies created using this class will be thread-safe if the
- * underlying (target) class is thread-safe.
+ * <p>Proxies created using this class will be thread-safe if the			// 如果目标对象是线程安全的, 那使用这个类创建的代理对象也是线程安全的
+ * underlying (target) class is thread-safe.								// 也就是说代理对象本身是无状态的
  *
  * <p>Proxies are serializable so long as all Advisors (including Advices
  * and Pointcuts) and the TargetSource are serializable.
@@ -128,7 +128,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			Method[] methods = proxiedInterface.getDeclaredMethods();
 			for (Method method : methods) {
 				if (AopUtils.isEqualsMethod(method)) {
-					this.equalsDefined = true;	//代理对象自己实现了equals方法
+					this.equalsDefined = true;		//代理对象自己实现了equals方法
 				}
 				if (AopUtils.isHashCodeMethod(method)) {
 					this.hashCodeDefined = true;	//代理对象自己实现了hashcode方法
@@ -186,7 +186,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 
 			// Get the interception chain for this method.
-			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);	//获取拦截器链
+			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);	// 获取拦截器链
 
 			// Check whether we have any advice. If we don't, we can fallback on direct
 			// reflective invocation of the target, and avoid creating a MethodInvocation.

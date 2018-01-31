@@ -71,7 +71,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	 * Parses the {@code <tx:annotation-driven/>} tag. Will
 	 * {@link AopNamespaceUtils#registerAutoProxyCreatorIfNecessary register an AutoProxyCreator}
 	 * with the container as necessary.
-	 */
+	 */	// 解析标签 <tx:annotation-driven/>成对应的 BeanDefinition
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
@@ -107,37 +107,41 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	 * Inner class to just introduce an AOP framework dependency when actually in proxy mode.
 	 */
 	private static class AopAutoProxyConfigurer {
-
+		//这个方法可以让spring 为事务自动创建代理,比较重要的是element中要指定对应的事务管理器
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
-			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;
-			if (!parserContext.getRegistry().containsBeanDefinition(txAdvisorBeanName)) {
-				Object eleSource = parserContext.extractSource(element);
+			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;		//事务bean的默认名称就叫这个名字
+			if (!parserContext.getRegistry().containsBeanDefinition(txAdvisorBeanName)) {	//没有代表还没注册,需要注册进去
+				Object eleSource = parserContext.extractSource(element);	//解析xml element
 
-				// Create the TransactionAttributeSource definition.
+				// Create the TransactionAttributeSource definition.		//创建TransactionAttributeSource RootBeanDefinition
 				RootBeanDefinition sourceDef = new RootBeanDefinition(
 						"org.springframework.transaction.annotation.AnnotationTransactionAttributeSource");
 				sourceDef.setSource(eleSource);
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+				// registerWithGeneratedName方法和registerBeanDefinition是一样的
+				// 注册RootBeanDefinition到一个集中的map中,后续创建事务代理对象时需要用到这些definition
+				// 为事务创建代理对象时,是先创建一个动态代理对象,然后把拦截器advisor都织入进去
+				// 需要一个BeanPostProcesser,这个是哪里的呢?
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
-				// Create the TransactionInterceptor definition.
+				// Create the TransactionInterceptor definition.			//创建TransactionInterceptor RootBeanDefinition
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(TransactionInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-				registerTransactionManager(element, interceptorDef);
+				registerTransactionManager(element, interceptorDef);		//注册事务管理器
 				interceptorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
-				// Create the TransactionAttributeSourceAdvisor definition.
+				// Create the TransactionAttributeSourceAdvisor definition.	//创建TransactionAttributeSourceAdvisor RootBeanDefinition
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryTransactionAttributeSourceAdvisor.class);	//定义ProxyBeanFactory getObject 为 BeanFactoryTransactionAttributeSourceAdvisor
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				advisorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				advisorDef.getPropertyValues().add("adviceBeanName", interceptorName);
 				if (element.hasAttribute("order")) {
-					advisorDef.getPropertyValues().add("order", element.getAttribute("order"));
+					advisorDef.getPropertyValues().add("order", element.getAttribute("order"));		//这种很多属性的,直接利用map塞值还是比较方便的
 				}
 				parserContext.getRegistry().registerBeanDefinition(txAdvisorBeanName, advisorDef);	//注册RootBeanDefinition
 
@@ -145,7 +149,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				compositeDef.addNestedComponent(new BeanComponentDefinition(sourceDef, sourceName));			//AnnotationTransactionAttributeSource
 				compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));	//TransactionInterceptor
 				compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, txAdvisorBeanName));	//RootBeanDefinition BeanFactoryTransactionAttributeSourceAdvisor
-				parserContext.registerComponent(compositeDef);	//也是一个注册,好像是注册上面三者之间的关系
+				parserContext.registerComponent(compositeDef);	// 也是一个注册,好像是注册上面三者之间的关系??
 			}
 		}
 	}

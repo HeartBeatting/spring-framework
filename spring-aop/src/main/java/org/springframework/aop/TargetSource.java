@@ -17,16 +17,16 @@
 package org.springframework.aop;
 
 /**
- * A {@code TargetSource} is used to obtain the current "target" of
- * an AOP invocation, which will be invoked via reflection if no around
- * advice chooses to end the interceptor chain itself.
+ * A {@code TargetSource} is used to obtain the current "target" of			// TargetSource用来获取aop的目标对象
+ * an AOP invocation, which will be invoked via reflection if no around		// 会通过反射调用
+ * advice chooses to end the interceptor chain itself.						// 如果没有around拦截终止他
  *
- * <p>If a {@code TargetSource} is "static", it will always return
- * the same target, allowing optimizations in the AOP framework. Dynamic
- * target sources can support pooling, hot swapping, etc.
+ * <p>If a {@code TargetSource} is "static", it will always return			// 如果TargetSource是静态的,每次都会返回同一个对象.
+ * the same target, allowing optimizations in the AOP framework. Dynamic	// 允许修改
+ * target sources can support pooling, hot swapping, etc.					// 动态修改target sources可以支持池化和热切换
  *
- * <p>Application developers don't usually need to work with
- * {@code TargetSources} directly: this is an AOP framework interface.
+ * <p>Application developers don't usually need to work with				// 应用开发者正常不需要关心
+ * {@code TargetSources} directly: this is an AOP framework interface.		// 这是Spring aop框架中的接口
  *
  * @author Rod Johnson
  */

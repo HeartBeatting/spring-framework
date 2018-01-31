@@ -262,7 +262,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
 		if (!this.earlyProxyReferences.containsKey(cacheKey)) {
-			this.earlyProxyReferences.put(cacheKey, Boolean.TRUE);
+			this.earlyProxyReferences.put(cacheKey, Boolean.TRUE);	//提前暴露代理对象的引用
 		}
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
@@ -319,7 +319,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {	//创建代理对象(代理对象包装了被代理对象)
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
-			if (!this.earlyProxyReferences.containsKey(cacheKey)) {
+			if (!this.earlyProxyReferences.containsKey(cacheKey)) {		//如果是提前引用到的,说明还没创建完成,先不调用wrap方法
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}

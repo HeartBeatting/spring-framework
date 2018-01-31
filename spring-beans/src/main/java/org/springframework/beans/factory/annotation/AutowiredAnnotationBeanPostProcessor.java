@@ -16,26 +16,8 @@
 
 package org.springframework.beans.factory.annotation;
 
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
@@ -50,16 +32,18 @@ import org.springframework.beans.factory.config.InstantiationAwareBeanPostProces
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.core.BridgeMethodResolver;
-import org.springframework.core.GenericTypeResolver;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.Ordered;
-import org.springframework.core.PriorityOrdered;
+import org.springframework.core.*;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
@@ -132,11 +116,11 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * <p>Also supports JSR-330's {@link javax.inject.Inject} annotation, if available.
 	 */
 	@SuppressWarnings("unchecked")
-	public AutowiredAnnotationBeanPostProcessor() {
-		this.autowiredAnnotationTypes.add(Autowired.class);
-		this.autowiredAnnotationTypes.add(Value.class);
+	public AutowiredAnnotationBeanPostProcessor() {			//AutowiredAnnotationBeanPostProcessor 默认构造方法
+		this.autowiredAnnotationTypes.add(Autowired.class);	//autowiredAnnotationTypes里的注解都是会被自动注入的,@see 下面的方法findAutowiredAnnotation()
+		this.autowiredAnnotationTypes.add(Value.class);		//value是Autowired注解的辅助注解.
 		try {
-			this.autowiredAnnotationTypes.add((Class<? extends Annotation>)
+			this.autowiredAnnotationTypes.add((Class<? extends Annotation>)		//如果ClassUtils.forName能加载到Inject,就要支持Inject注解注入.
 					ClassUtils.forName("javax.inject.Inject", AutowiredAnnotationBeanPostProcessor.class.getClassLoader()));
 			logger.info("JSR-330 'javax.inject.Inject' annotation found and supported for autowiring");
 		}
@@ -290,9 +274,9 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
 
-		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
+		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);	//找到需要autowired的属性
 		try {
-			metadata.inject(bean, beanName, pvs);
+			metadata.inject(bean, beanName, pvs);												//注入进去,也就是对目标对象的各个域赋值,把对应的待注入对象的引用赋值进去.
 		}
 		catch (Throwable ex) {
 			throw new BeanCreationException(beanName, "Injection of autowired dependencies failed", ex);
@@ -317,54 +301,54 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		}
 	}
 
-
+	// 找到自动注入的元数据
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz, PropertyValues pvs) {
 		// Fall back to class name as cache key, for backwards compatibility with custom callers.
-		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
+		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());	//缓存key默认取beanName,没有就取class的全路径名!
 		// Quick check on the concurrent map first, with minimal locking.
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
-		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
+		if (InjectionMetadata.needsRefresh(metadata, clazz)) {								//metadata==null或者metadata.targetClass不是clazz
 			synchronized (this.injectionMetadataCache) {
 				metadata = this.injectionMetadataCache.get(cacheKey);
-				if (InjectionMetadata.needsRefresh(metadata, clazz)) {
+				if (InjectionMetadata.needsRefresh(metadata, clazz)) {		//双重判断,防止重复处理
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
-					metadata = buildAutowiringMetadata(clazz);
-					this.injectionMetadataCache.put(cacheKey, metadata);
+					metadata = buildAutowiringMetadata(clazz);				//找到待注入的对象
+					this.injectionMetadataCache.put(cacheKey, metadata);	//缓存下来
 				}
 			}
 		}
 		return metadata;
 	}
 
-	private InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {
+	private InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {		//根据clazz构建自动注入的对象
 		LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<InjectionMetadata.InjectedElement>();
 		Class<?> targetClass = clazz;
 
 		do {
 			LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<InjectionMetadata.InjectedElement>();
-			for (Field field : targetClass.getDeclaredFields()) {
-				Annotation ann = findAutowiredAnnotation(field);
+			for (Field field : targetClass.getDeclaredFields()) {			//注入对象的所有申明的域,这些都要实例化了才能注入
+				Annotation ann = findAutowiredAnnotation(field);			//这些域里如果有自动注入的注解,也要先注入进来,
 				if (ann != null) {
-					if (Modifier.isStatic(field.getModifiers())) {
+					if (Modifier.isStatic(field.getModifiers())) {			//注意: static域即使加了@Autowired注解,也不会自动注入的
 						if (logger.isWarnEnabled()) {
 							logger.warn("Autowired annotation is not supported on static fields: " + field);
 						}
 						continue;
 					}
-					boolean required = determineRequiredStatus(ann);
-					currElements.add(new AutowiredFieldElement(field, required));
+					boolean required = determineRequiredStatus(ann);				//获取Autowired的required值,这个值是用来表示是否必须的.
+					currElements.add(new AutowiredFieldElement(field, required));	//创建一个AutowiredFieldElement加入到currElements中
 				}
 			}
-			for (Method method : targetClass.getDeclaredMethods()) {
+			for (Method method : targetClass.getDeclaredMethods()) {		//找出注入对象的所有申明方法
 				Annotation ann = null;
 				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 				if (BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
 					ann = findAutowiredAnnotation(bridgedMethod);
 				}
 				if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
-					if (Modifier.isStatic(method.getModifiers())) {
+					if (Modifier.isStatic(method.getModifiers())) {					//同样static方法加上注解也不会自动注入的
 						if (logger.isWarnEnabled()) {
 							logger.warn("Autowired annotation is not supported on static methods: " + method);
 						}
@@ -380,12 +364,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					currElements.add(new AutowiredMethodElement(method, required, pd));
 				}
 			}
-			elements.addAll(0, currElements);
-			targetClass = targetClass.getSuperclass();
+			elements.addAll(0, currElements);					//每次都加到前面
+			targetClass = targetClass.getSuperclass();				//找到class的父类
 		}
-		while (targetClass != null && targetClass != Object.class);
+		while (targetClass != null && targetClass != Object.class);	//继续循环,直到没有父类为止.
 
-		return new InjectionMetadata(clazz, elements);
+		return new InjectionMetadata(clazz, elements);				//返回待注入的对象,包括了clazz(类)和elements(待注入的元素)
 	}
 
 	private Annotation findAutowiredAnnotation(AccessibleObject ao) {

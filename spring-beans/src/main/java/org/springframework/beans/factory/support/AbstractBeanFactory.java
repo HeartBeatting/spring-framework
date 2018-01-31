@@ -181,7 +181,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T> T doGetBean(
-			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
+			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)		// 这里是Spring获取bean/创建bean的核心代码
 			throws BeansException {
 
 		final String beanName = transformedBeanName(name);	//获取bean的标准名称
@@ -205,7 +205,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
-			if (isPrototypeCurrentlyInCreation(beanName)) {
+			if (isPrototypeCurrentlyInCreation(beanName)) {		// 这里判断beanName是否是正在创建的bean.
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
@@ -229,7 +229,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			try {
-				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);	// 这里是获取bean definition
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
@@ -243,6 +243,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
+					//这里只是创建了单例bean
 					sharedInstance = getSingleton(beanName, new ObjectFactory<Object>() {
 						public Object getObject() throws BeansException {
 							try {
@@ -257,7 +258,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							}
 						}
 					});
-					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);	//获取bean的实例
+					//如果有需要,需要对上面的bean进行包装(代理对象)
+					bean = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
 				else if (mbd.isPrototype()) {
@@ -882,8 +884,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param beanName the name of the bean
 	 */
 	protected boolean isPrototypeCurrentlyInCreation(String beanName) {
-		Object curVal = this.prototypesCurrentlyInCreation.get();
-		return (curVal != null &&
+		Object curVal = this.prototypesCurrentlyInCreation.get();	// prototypesCurrentlyInCreation 用于将当前线程正在创建的beanName放进去.
+		return (curVal != null &&									// 如果后续有需要注入这些待创建的bean,则说明出现了循环注入.
 				(curVal.equals(beanName) || (curVal instanceof Set && ((Set<?>) curVal).contains(beanName))));
 	}
 

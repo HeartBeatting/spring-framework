@@ -109,9 +109,9 @@ public class ProxyConfig implements Serializable {
 	}
 
 	/**
-	 * Set whether the proxy should be exposed by the AOP framework as a
+	 * Set whether the proxy should be exposed by the AOP framework as a			// 设置是否暴露代理对象, 当做一个ThreadLocal
 	 * ThreadLocal for retrieval via the AopContext class. This is useful
-	 * if an advised object needs to call another advised method on itself.
+	 * if an advised object needs to call another advised method on itself.			// 当一个增强了的对象,想调用自身的另一个增强了的方法
 	 * (If it uses {@code this}, the invocation will not be advised).
 	 * <p>Default is "false", in order to avoid unnecessary extra interception.
 	 * This means that no guarantees are provided that AopContext access will

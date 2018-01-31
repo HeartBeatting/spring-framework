@@ -239,7 +239,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String basePackage : basePackages) {
-			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);		//找到所有的注解了@component或者注解标记了@component的注解 (@component就是spring的元注解)
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
@@ -250,11 +250,11 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
-				if (checkCandidate(beanName, candidate)) {
+				if (checkCandidate(beanName, candidate)) {							//判断两个beanDefinition是否冲突
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
-					registerBeanDefinition(definitionHolder, this.registry);
+					registerBeanDefinition(definitionHolder, this.registry);		//校验通过了,这里会注册bean definition
 				}
 			}
 		}
@@ -296,17 +296,17 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * existing, compatible bean definition for the specified name
 	 * @throws ConflictingBeanDefinitionException if an existing, incompatible
 	 * bean definition has been found for the specified name
-	 */
+	 */										//beanName是注解Bean的beanName; beanDefinition是注解bean的beanDefinition
 	protected boolean checkCandidate(String beanName, BeanDefinition beanDefinition) throws IllegalStateException {
-		if (!this.registry.containsBeanDefinition(beanName)) {
+		if (!this.registry.containsBeanDefinition(beanName)) {						//判断beanName还没有被注册过,直接返回true
 			return true;
 		}
-		BeanDefinition existingDef = this.registry.getBeanDefinition(beanName);
-		BeanDefinition originatingDef = existingDef.getOriginatingBeanDefinition();
-		if (originatingDef != null) {
+		BeanDefinition existingDef = this.registry.getBeanDefinition(beanName);		//existingDef是已经注册了的beanDefinition
+		BeanDefinition originatingDef = existingDef.getOriginatingBeanDefinition();	//如果originatingDef不为空,那么existingDef就只是一个装饰器,需要找到原始的.
+		if (originatingDef != null) {												//在我们这个问题中,这里originatingDef为null.
 			existingDef = originatingDef;
 		}
-		if (isCompatible(beanDefinition, existingDef)) {
+		if (isCompatible(beanDefinition, existingDef)) {	//判断两个beanDefinition是否兼容; 不兼容就返回false.
 			return false;
 		}
 		throw new ConflictingBeanDefinitionException("Annotation-specified bean name '" + beanName +
@@ -315,10 +315,10 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	}
 
 	/**
-	 * Determine whether the given new bean definition is compatible with
+	 * Determine whether the given new bean definition is compatible with				//判断newDefinition是否和existingDefinition兼容
 	 * the given existing bean definition.
-	 * <p>The default implementation considers them as compatible when the existing
-	 * bean definition comes from the same source or from a non-scanning source.
+	 * <p>The default implementation considers them as compatible when the existing		//只要两个都不是scanning source(也就是都不是通过scan 注解生成的)
+	 * bean definition comes from the same source or from a non-scanning source.		//并且(the same source)来源相同就认为他们是兼容的
 	 * @param newDefinition the new bean definition, originated from scanning
 	 * @param existingDefinition the existing bean definition, potentially an
 	 * explicitly defined one or a previously generated one from scanning
@@ -326,9 +326,18 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * new definition to be skipped in favor of the existing definition
 	 */
 	protected boolean isCompatible(BeanDefinition newDefinition, BeanDefinition existingDefinition) {
-		return (!(existingDefinition instanceof ScannedGenericBeanDefinition) ||  // explicitly registered overriding bean
+		return (!(existingDefinition instanceof ScannedGenericBeanDefinition) ||  	 // explicitly registered overriding bean
 				newDefinition.getSource().equals(existingDefinition.getSource()) ||  // scanned same file twice
 				newDefinition.equals(existingDefinition));  // scanned equivalent class twice
+
+		/**
+		 * 这边有三个判断:
+		 * (1)第一个中判断是否是ScannedGenericBeanDefinition, ScannedGenericBeanDefinition表示是由scan注解生成的definition, 如果不是, 就代表existingDefinition是由xml定义的
+		 * (2)如果第一个instanceof成立,则继续判断第二个: 判断来源是否一致(就是是否扫描一个文件扫描了多次,当多个扫描器扫描的路径冲突会出现这样的情况)
+		 * (3)第二个不成立,继续判断第三行: newDefinition必须==existingDefinition
+		 *
+		 * 在我们用xml和注解定义两个bean时,第一行就是不成立的,所以直接就返回true了
+		 */
 	}
 
 

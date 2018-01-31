@@ -56,11 +56,11 @@ public interface SingletonBeanRegistry {
 	void registerSingleton(String beanName, Object singletonObject);
 
 	/**
-	 * Return the (raw) singleton object registered under the given name.
-	 * <p>Only checks already instantiated singletons; does not return an Object
-	 * for singleton bean definitions which have not been instantiated yet.
-	 * <p>The main purpose of this method is to access manually registered singletons
-	 * (see {@link #registerSingleton}). Can also be used to access a singleton
+	 * Return the (raw) singleton object registered under the given name.					// 返回未加工的单例对象
+	 * <p>Only checks already instantiated singletons; does not return an Object			// 只检验已经实例化的单例对象
+	 * for singleton bean definitions which have not been instantiated yet.					// 不反悔没有实例化的
+	 * <p>The main purpose of this method is to access manually registered singletons		// 这个方法的主要目的是为了获取手工注册的单例
+	 * (see {@link #registerSingleton}). Can also be used to access a singleton				// 也可以用来获取已经创建的单例bean
 	 * defined by a bean definition that already been created, in a raw fashion.
 	 * <p><b>NOTE:</b> This lookup method is not aware of FactoryBean prefixes or aliases.
 	 * You need to resolve the canonical bean name first before obtaining the singleton instance.
