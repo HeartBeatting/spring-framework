@@ -16,26 +16,8 @@
 
 package org.springframework.web.servlet;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -59,7 +41,14 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.util.NestedServletException;
 import org.springframework.web.util.WebUtils;
 
-/**
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
+
+/** 这是SpringMVC映射和拦截器责任链的核心.
  * Central dispatcher for HTTP request handlers/controllers, e.g. for web UI controllers
  * or HTTP-based remote service exporters. Dispatches to registered handlers for processing
  * a web request, providing convenient mapping and exception handling facilities.
@@ -274,7 +263,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 	private static final Properties defaultStrategies;
 
-	static {
+	static {	// 在static方法块中, 使用try...catch..., 可以避免对象实例化异常导致对象无法加载的问题.
 		// Load default strategy implementations from properties file.
 		// This is currently strictly internal and not meant to be customized
 		// by application developers.
@@ -282,7 +271,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
-		catch (IOException ex) {
+		catch (IOException ex) {	// 这里是io操作,需要try...catch IOException.
 			throw new IllegalStateException("Could not load '" + DEFAULT_STRATEGIES_PATH + "': " + ex.getMessage());
 		}
 	}
@@ -923,7 +912,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
-		HandlerExecutionChain mappedHandler = null;
+		HandlerExecutionChain mappedHandler = null;		// mappedHandler是spring-mvc的一个责任链的引用,这只是责任链的一个头节点.
 		boolean multipartRequestParsed = false;
 
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
@@ -937,14 +926,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
-				mappedHandler = getHandler(processedRequest);
+				mappedHandler = getHandler(processedRequest);	// 找到对应的handler
 				if (mappedHandler == null || mappedHandler.getHandler() == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
 				// Determine handler adapter for the current request.
-				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());	// 这里是获取适配器,适配器干嘛的?
 
 				// Process last-modified header, if supported by the handler.
 				String method = request.getMethod();
@@ -959,19 +948,19 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
-				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+				if (!mappedHandler.applyPreHandle(processedRequest, response)) {	// 调用所有拦截器的前置拦截.
 					return;
 				}
 
 				// Actually invoke the handler.
-				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());	// 调用目标handler
 
-				if (asyncManager.isConcurrentHandlingStarted()) {
+				if (asyncManager.isConcurrentHandlingStarted()) {	// 这里是用来支持并发的handler的?
 					return;
 				}
 
 				applyDefaultViewName(processedRequest, mv);
-				mappedHandler.applyPostHandle(processedRequest, response, mv);
+				mappedHandler.applyPostHandle(processedRequest, response, mv);	// post是在生成ModelAndView之后.
 			}
 			catch (Exception ex) {
 				dispatchException = ex;
@@ -981,7 +970,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
-			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
+			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);	// 这里会调用triggerAfterCompletion
 		}
 		catch (Exception ex) {
 			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);

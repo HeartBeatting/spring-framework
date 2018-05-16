@@ -16,24 +16,19 @@
 
 package org.springframework.core.io.support;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.util.*;
 
 /**
  * General purpose factory loading mechanism for internal use within the framework.
@@ -84,7 +79,7 @@ public abstract class SpringFactoriesLoader {
 		if (classLoaderToUse == null) {
 			classLoaderToUse = SpringFactoriesLoader.class.getClassLoader();
 		}
-		List<String> factoryNames = loadFactoryNames(factoryClass, classLoaderToUse);
+		List<String> factoryNames = loadFactoryNames(factoryClass, classLoaderToUse);	// spring用到了很多classLoader,能实现更多订制和解耦的功能.
 		if (logger.isTraceEnabled()) {
 			logger.trace("Loaded [" + factoryClass.getName() + "] names: " + factoryNames);
 		}
@@ -97,7 +92,7 @@ public abstract class SpringFactoriesLoader {
 	}
 
 	/**
-	 * Load the fully qualified class names of factory implementations of the
+	 * Load the fully qualified class names of factory implementations of the		// spring.factories里键值对是接口和class的全路径名.
 	 * given type from {@value #FACTORIES_RESOURCE_LOCATION}, using the given
 	 * class loader.
 	 * @param factoryClass the interface or abstract class representing the factory
@@ -109,14 +104,14 @@ public abstract class SpringFactoriesLoader {
 	public static List<String> loadFactoryNames(Class<?> factoryClass, ClassLoader classLoader) {
 		String factoryClassName = factoryClass.getName();
 		try {
-			Enumeration<URL> urls = (classLoader != null ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :
+			Enumeration<URL> urls = (classLoader != null ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :	// 这里是找到所有的spring.factories文件.
 					ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));
 			List<String> result = new ArrayList<String>();
-			while (urls.hasMoreElements()) {
+			while (urls.hasMoreElements()) {																	// 文件一个一个的解析
 				URL url = urls.nextElement();
 				Properties properties = PropertiesLoaderUtils.loadProperties(new UrlResource(url));
-				String factoryClassNames = properties.getProperty(factoryClassName);
-				result.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray(factoryClassNames)));
+				String factoryClassNames = properties.getProperty(factoryClassName);							// 根据factoryClassName找文件中有没有对应的.
+				result.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray(factoryClassNames)));	// value是用逗号隔开的数组
 			}
 			return result;
 		}

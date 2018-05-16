@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * MVC framework SPI, allowing parameterization of the core MVC workflow.
+ * MVC framework SPI, allowing parameterization of the core MVC workflow.				// 这里强调的是一个SPI.
  *
  * <p>Interface that must be implemented for each handler type to handle a request.
  * This interface is used to allow the {@link DispatcherServlet} to be indefinitely
